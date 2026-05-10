@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VELTRIX — Discord Bot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="dark"]{
+  --bg:#08080e;--bg2:#0d0d17;--bg3:#161622;
+  --panel:#111120;--panel2:#1a1a2e;
+  --border:rgba(212,32,96,.15);--border2:rgba(255,255,255,.07);
+  --text:#eaeaf6;--muted:#5e5e80;--muted2:#9090b8;
+  --red:#d42060;--red2:#ff3a7a;--green:#1ecc6e;
+  --discord:#5865F2;--shadow:rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+  --bg:#f2f2f8;--bg2:#e8e8f2;--bg3:#dcdce8;
+  --panel:#ffffff;--panel2:#f0f0f8;
+  --border:rgba(212,32,96,.18);--border2:rgba(0,0,0,.08);
+  --text:#0d0d1a;--muted:#6666aa;--muted2:#444470;--shadow:rgba(0,0,0,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;transition:background .3s,color .3s;}
+a{text-decoration:none;color:inherit;}
+
+/* ─ NAV ─ */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:60px;background:rgba(8,8,14,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);transition:background .3s;gap:.5rem;}
+[data-theme="light"] nav{background:rgba(242,242,248,.97);}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:.1em;cursor:pointer;flex-shrink:0;}
+.logo em{color:var(--red);font-style:normal;}
+.nav-links{display:flex;gap:1.5rem;flex:1;justify-content:center;}
+.nav-links a{color:var(--muted);font-size:.82rem;font-weight:500;transition:color .2s;white-space:nowrap;}
+.nav-links a:hover{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+
+/* ─ LANG DROPDOWN ─ */
+.lang-wrap{position:relative;}
+.lang-btn{display:flex;align-items:center;gap:.35rem;background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:.35rem .7rem;font-size:.78rem;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .18s;font-family:inherit;}
+.lang-btn:hover{border-color:var(--red);color:var(--text);}
+.lang-flag{font-size:1rem;}
+.lang-drop{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--panel);border:1px solid var(--border2);border-radius:10px;overflow:hidden;box-shadow:0 16px 40px var(--shadow);min-width:160px;z-index:200;}
+.lang-wrap.open .lang-drop{display:block;}
+.lang-option{display:flex;align-items:center;gap:.6rem;padding:.6rem .9rem;font-size:.83rem;font-weight:500;cursor:pointer;transition:background .15s;}
+.lang-option:hover{background:rgba(212,32,96,.08);}
+.lang-option.active{color:var(--red);}
+
+/* ─ THEME BTN ─ */
+.theme-btn{background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:.35rem .6rem;font-size:1rem;cursor:pointer;transition:all .18s;line-height:1;}
+.theme-btn:hover{border-color:var(--red);}
+
+/* ─ USER CHIP ─ */
+.chip{display:none;align-items:center;gap:.5rem;background:var(--panel);border:1px solid var(--border2);padding:.26rem .8rem .26rem .35rem;border-radius:20px;font-size:.82rem;font-weight:500;cursor:pointer;}
+.chip img{width:24px;height:24px;border-radius:50%;}
+.chip.on{display:flex;}
+
+/* ─ BUTTONS ─ */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:.845rem;font-weight:600;transition:all .18s;white-space:nowrap;}
+.r{background:var(--red);color:#fff;}.r:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(212,32,96,.3);}
+.d{background:var(--discord);color:#fff;}.d:hover{background:#4752c4;transform:translateY(-1px);box-shadow:0 8px 24px rgba(88,101,242,.3);}
+.g{background:transparent;color:var(--text);border:1px solid var(--border2);}.g:hover{border-color:var(--red);color:var(--red);}
+.sm{padding:.36rem .85rem;font-size:.78rem;}
+.lg{padding:.7rem 1.75rem;font-size:.95rem;}
+
+/* ─ HERO ─ */
+.hero{min-height:100vh;display:flex;align-items:center;padding:80px 5% 60px;position:relative;overflow:hidden;}
+
+.hgrid{display:none;}
+.hc{position:relative;z-index:1;max-width:660px;}
+.badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(212,32,96,.1);border:1px solid rgba(212,32,96,.22);color:#ff799e;padding:.28rem .85rem;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.5rem;}
+h1{font-family:'Rajdhani',sans-serif;font-size:clamp(2.8rem,5.5vw,4.2rem);font-weight:700;line-height:1.05;margin-bottom:1.1rem;}
+h1 em{color:var(--red);font-style:normal;}
+.hsub{font-size:1rem;color:var(--muted2);line-height:1.8;margin-bottom:.75rem;max-width:520px;}
+.hsub2{font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:2rem;max-width:520px;border-left:2px solid var(--red);padding-left:.9rem;}
+.hbtns{display:flex;gap:.85rem;flex-wrap:wrap;}
+.stats{display:flex;gap:2.5rem;margin-top:3.5rem;padding-top:1.75rem;border-top:1px solid var(--border2);}
+.sn{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;display:block;}
+.sl{font-size:.73rem;color:var(--muted);letter-spacing:.04em;}
+
+/* ─ STRIP ─ */
+.strip{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.25rem 0;overflow:hidden;}
+.strip-inner{display:flex;gap:1rem;animation:scroll 30s linear infinite;width:max-content;}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tb{display:flex;align-items:center;gap:.45rem;padding:.32rem .9rem;border-radius:5px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;white-space:nowrap;letter-spacing:.05em;}
+
+/* ─ SECTIONS ─ */
+section{padding:100px 5%;}
+.bg2{background:var(--bg2);}
+.sec-tag{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:.55rem;}
+.sec-h{font-family:'Rajdhani',sans-serif;font-size:clamp(1.9rem,3.5vw,2.7rem);font-weight:700;line-height:1.12;margin-bottom:.7rem;}
+.sec-s{color:var(--muted2);font-size:.93rem;line-height:1.75;max-width:560px;}
+
+/* ─ FEATURES ─ */
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:3rem;}
+.fc{background:var(--panel);padding:1.75rem;position:relative;overflow:hidden;transition:background .2s;}
+.fc:hover{background:var(--panel2);}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;transition:.3s;}
+.fc:hover::before{opacity:1;}
+.fi{font-size:1.5rem;margin-bottom:.9rem;display:block;}
+.fc h3{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.04em;margin-bottom:.4rem;}
+.fc p{font-size:.83rem;color:var(--muted2);line-height:1.65;}
+
+/* ─ STATUS ─ */
+.status-card{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:2rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.sav{width:80px;height:80px;border-radius:50%;border:3px solid var(--border2);position:relative;flex-shrink:0;background:linear-gradient(135deg,var(--red),#661030);display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.sdot{position:absolute;bottom:4px;right:4px;width:16px;height:16px;border-radius:50%;background:var(--green);border:2px solid var(--panel);}
+.sinfo h3{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.3rem;}
+.sinfo p{font-size:.85rem;color:var(--muted2);}
+.spill{display:inline-flex;align-items:center;gap:.35rem;background:rgba(30,204,110,.1);border:1px solid rgba(30,204,110,.2);color:var(--green);padding:.25rem .7rem;border-radius:20px;font-size:.75rem;font-weight:600;margin-top:.5rem;}
+.sstats{display:flex;gap:1.5rem;flex-wrap:wrap;margin-left:auto;}
+.ssi{text-align:center;}
+.ssn{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;display:block;}
+.ssl{font-size:.73rem;color:var(--muted);letter-spacing:.04em;}
+
+/* ─ LEADERBOARD ─ */
+.lb-list{display:flex;flex-direction:column;gap:.75rem;margin-top:2.5rem;}
+.lb-item{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1.1rem;transition:border-color .2s,transform .2s;}
+.lb-item:hover{border-color:var(--red);transform:translateX(4px);}
+.lb-rank{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;width:28px;text-align:center;flex-shrink:0;}
+.gold{color:#f5c518;}.silver{color:#c0c0c0;}.bronze{color:#cd7f32;}
+.lb-ico{width:44px;height:44px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.lb-name{font-weight:600;font-size:.95rem;}
+.lb-sub{font-size:.78rem;color:var(--muted2);margin-top:.1rem;}
+.lb-badge{padding:.2rem .6rem;border-radius:20px;font-size:.72rem;font-weight:600;background:rgba(212,32,96,.1);color:var(--red);border:1px solid rgba(212,32,96,.2);margin-left:auto;white-space:nowrap;}
+
+/* ─ CAPS ─ */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1.1rem;margin-top:3rem;}
+.cc{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:1.5rem;transition:border-color .22s,transform .22s;}
+.cc:hover{border-color:var(--red);transform:translateY(-3px);}
+.ci{font-size:1.6rem;margin-bottom:.75rem;display:block;}
+.cc h4{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.04em;margin-bottom:.55rem;}
+.cc ul{list-style:none;}
+.cc li{font-size:.79rem;color:var(--muted2);padding:.2rem 0;display:flex;gap:.4rem;line-height:1.4;}
+.cc li::before{content:'›';color:var(--red);flex-shrink:0;}
+
+/* ─ DASHBOARD PROMO ─ */
+.dash-promo{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;margin-top:3rem;}
+.mockup{background:var(--panel2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.4);}
+.mock-bar{background:var(--bg3);padding:.65rem 1rem;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--border2);}
+.mdot{width:10px;height:10px;border-radius:50%;}
+.mock-url{font-size:.72rem;color:var(--muted);margin-left:.3rem;}
+.mock-body{display:flex;height:260px;}
+.mock-side{width:130px;background:var(--panel);border-right:1px solid var(--border2);padding:.6rem;display:flex;flex-direction:column;gap:.3rem;flex-shrink:0;}
+.mock-sect{font-size:.6rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;padding:.35rem .5rem .1rem;}
+.mock-item{padding:.38rem .55rem;border-radius:5px;font-size:.7rem;color:var(--muted2);display:flex;align-items:center;gap:.35rem;}
+.mock-item.a{background:rgba(212,32,96,.12);color:var(--red);}
+.mock-main{flex:1;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;}
+.mock-row{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+.mock-stat{background:var(--panel);border:1px solid var(--border2);border-radius:7px;padding:.5rem .65rem;}
+.mock-stat-n{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;}
+.mock-stat-l{font-size:.62rem;color:var(--muted);}
+.mock-tog-row{background:var(--panel);border:1px solid var(--border2);border-radius:7px;padding:.45rem .65rem;display:flex;align-items:center;justify-content:space-between;}
+.mock-tog-l{font-size:.68rem;color:var(--muted2);}
+.mock-tog{width:26px;height:14px;border-radius:7px;background:var(--red);position:relative;flex-shrink:0;}
+.mock-tog::after{content:'';position:absolute;right:2px;top:2px;width:10px;height:10px;border-radius:50%;background:#fff;}
+.mock-tog.off{background:var(--bg3);}
+.mock-tog.off::after{right:auto;left:2px;}
+.df-list{display:flex;flex-direction:column;gap:.9rem;}
+.df{display:flex;gap:.75rem;align-items:flex-start;}
+.df-ico{width:36px;height:36px;border-radius:8px;background:rgba(212,32,96,.1);border:1px solid rgba(212,32,96,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.df h4{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.15rem;}
+.df p{font-size:.8rem;color:var(--muted2);line-height:1.5;}
+.rec-box{background:rgba(212,32,96,.07);border:1px solid rgba(212,32,96,.2);border-radius:10px;padding:1rem 1.25rem;margin-top:1.5rem;font-size:.85rem;color:var(--muted2);line-height:1.6;}
+.rec-box strong{color:var(--red);}
+.dash-btns{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.25rem;}
+
+/* ─ STEPS ─ */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0;margin-top:3rem;position:relative;}
+.steps::before{content:'';position:absolute;top:27px;left:0;right:0;height:1px;background:var(--border2);}
+.step{padding:0 1.25rem 2rem;text-align:center;position:relative;}
+.snum{width:54px;height:54px;border-radius:50%;background:var(--bg);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--red);margin:0 auto 1rem;position:relative;z-index:1;}
+.step h3{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.4rem;}
+.step p{font-size:.78rem;color:var(--muted2);line-height:1.6;}
+
+/* ─ LOGIN ─ */
+.login-bg{background:linear-gradient(135deg,rgba(212,32,96,.07),rgba(59,142,234,.04));border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center;}
+.lcard{display:inline-flex;flex-direction:column;align-items:center;gap:1.25rem;background:var(--panel);border:1px solid var(--border2);border-radius:18px;padding:2.75rem 3rem;max-width:440px;width:100%;box-shadow:0 32px 80px var(--shadow);}
+.lcard h2{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:.04em;}
+.lcard > p{font-size:.85rem;color:var(--muted2);line-height:1.65;}
+.lnote{font-size:.72rem;color:var(--muted);}
+
+/* ─ CTA ─ */
+.cta{text-align:center;}
+.cta h2{font-family:'Rajdhani',sans-serif;font-size:clamp(2rem,4vw,2.9rem);font-weight:700;margin-bottom:.8rem;}
+.cta p{color:var(--muted2);margin-bottom:2rem;}
+.ctabtns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+/* ─ FOOTER ─ */
+footer{background:var(--bg2);border-top:1px solid var(--border2);padding:3rem 5% 2rem;}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem;}
+.foot-brand p{color:var(--muted2);font-size:.84rem;line-height:1.65;max-width:250px;margin-top:.6rem;}
+.foot-col h5{font-family:'Rajdhani',sans-serif;font-size:.84rem;font-weight:700;letter-spacing:.08em;margin-bottom:.9rem;}
+.foot-col a{display:block;color:var(--muted2);font-size:.83rem;margin-bottom:.45rem;transition:color .2s;cursor:pointer;}
+.foot-col a:hover{color:var(--red);}
+.foot-bottom{border-top:1px solid var(--border2);padding-top:1.5rem;display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);}
+.di{width:16px;height:16px;fill:currentColor;flex-shrink:0;}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s,transform .6s;}
+.rv.in{opacity:1;transform:translateY(0);}
+.rv2{transition-delay:.1s;}.rv3{transition-delay:.2s;}.rv4{transition-delay:.3s;}
+@media(max-width:1000px){.nav-links{display:none;}}
+@media(max-width:900px){.dash-promo{grid-template-columns:1fr;}}
+@media(max-width:760px){
+  nav{padding:0 4%;height:56px;}
+  .logo{font-size:1.2rem;}
+  .btn.lg{padding:.55rem 1.1rem;font-size:.85rem;}
+  .hero{padding:70px 5% 40px;}
+  h1{font-size:clamp(2rem,8vw,3rem)!important;}
+  .hsub{font-size:.92rem;}
+  .stats{gap:1.25rem;flex-wrap:wrap;}
+  .sn{font-size:1.5rem;}
+  section{padding:70px 5%;}
+  .fg{grid-template-columns:1fr!important;}
+  .cg{grid-template-columns:1fr 1fr!important;}
+  .steps{grid-template-columns:1fr 1fr!important;}
+  .steps::before{display:none;}
+  .foot-top{grid-template-columns:1fr 1fr;}
+  .foot-bottom{flex-direction:column;gap:.5rem;text-align:center;}
+  .lang-btn{padding:.3rem .5rem;}
+  .chip{padding:.22rem .6rem .22rem .3rem;}
+  section.login-bg{padding:60px 4%;}
+  .lcard{padding:2rem 1.5rem;}
+}
+@media(max-width:480px){
+  .cg{grid-template-columns:1fr!important;}
+  .steps{grid-template-columns:1fr!important;}
+  .hbtns{flex-direction:column;}
+  .hbtns .btn{width:100%;justify-content:center;}
+  .foot-top{grid-template-columns:1fr;}
+  .stats{gap:1rem;}
+  .sn{font-size:1.4rem;}
+  .strip-inner .tb{font-size:.8rem;padding:.28rem .7rem;}
+}
+
+/* ─ HERO BG ─ */
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(212,32,96,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(212,32,96,.055) 1px,transparent 1px);background-size:58px 58px;-webkit-mask-image:radial-gradient(ellipse 75% 75% at 30% 55%,#000 0%,transparent 80%);mask-image:radial-gradient(ellipse 75% 75% at 30% 55%,#000 0%,transparent 80%);pointer-events:none;}
+.hero::before{content:'';position:absolute;top:-15%;left:-8%;width:580px;height:580px;border-radius:50%;background:radial-gradient(circle,rgba(212,32,96,.13) 0%,transparent 68%);pointer-events:none;animation:orb1 9s ease-in-out infinite;}
+.hero::after{content:'';position:absolute;bottom:-8%;right:-4%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(88,101,242,.07) 0%,transparent 68%);pointer-events:none;animation:orb1 12s ease-in-out infinite reverse;}
+@keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-25px)}}
+
+/* ─ BADGE PULSE ─ */
+.badge{animation:badge-glow 3s ease-in-out infinite;}
+@keyframes badge-glow{0%,100%{box-shadow:0 0 0 0 rgba(212,32,96,0)}50%{box-shadow:0 0 14px 2px rgba(212,32,96,.18)}}
+
+/* ─ CARD HOVER GLOW ─ */
+.fc:hover{background:var(--panel2);box-shadow:0 0 40px rgba(212,32,96,.06);}
+.cc:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 12px 40px rgba(212,32,96,.1);}
+.lb-item:hover{border-color:var(--red);transform:translateX(4px);box-shadow:4px 0 20px rgba(212,32,96,.08);}
+
+/* ─ WHY US COMPARISON ─ */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;}
+.why-col{border-radius:16px;padding:2rem;display:flex;flex-direction:column;}
+.why-col-bad{background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);}
+.why-col-good{background:rgba(212,32,96,.05);border:1px solid rgba(212,32,96,.24);position:relative;overflow:hidden;}
+.why-col-good::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);}
+.why-col-head{display:flex;align-items:center;gap:.55rem;font-family:'Rajdhani',sans-serif;font-size:1.12rem;font-weight:700;letter-spacing:.06em;padding-bottom:1rem;border-bottom:1px solid var(--border2);margin-bottom:.65rem;}
+.why-row{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.why-row:last-child{border-bottom:none;padding-bottom:0;}
+.why-icon{font-size:.9rem;flex-shrink:0;margin-top:.13rem;width:20px;text-align:center;}
+.why-txt strong{color:var(--text);font-weight:600;font-size:.85rem;display:block;margin-bottom:.12rem;}
+.why-txt span{font-size:.81rem;color:var(--muted2);line-height:1.55;}
+.why-bottom{display:flex;justify-content:center;gap:3rem;margin-top:2.5rem;padding:1.75rem 2rem;background:rgba(212,32,96,.06);border:1px solid rgba(212,32,96,.18);border-radius:14px;flex-wrap:wrap;}
+.why-stat{text-align:center;}
+.why-sn{font-family:'Rajdhani',sans-serif;font-size:1.85rem;font-weight:700;color:var(--red);display:block;}
+.why-sl{font-size:.73rem;color:var(--muted);letter-spacing:.04em;}
+[data-theme="light"] .why-col-bad{background:rgba(0,0,0,.025);border-color:rgba(0,0,0,.09);}
+[data-theme="light"] .why-row{border-bottom-color:rgba(0,0,0,.05);}
+@media(max-width:640px){.why-grid{grid-template-columns:1fr;}.why-bottom{gap:1.75rem;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="location.href='index.html'">⚔ VELTR<em>IX</em></div>
+  <div class="nav-links">
+    <a href="#features" data-t="navFeatures">Features</a>
+    <a href="#caps" data-t="navCaps">Capabilities</a>
+    <a href="#why">Why Us?</a>
+    <a href="#status" data-t="navStatus">Bot Status</a>
+    <a href="dashboard.html" data-t="navDash">Dashboard</a>
+    <a href="admin.html" id="nav-admin-link" style="display:none;color:#f5c518" data-t="navAdmin">👑 Admin</a>
+    <a href="https://discord.gg/uu9SY6Hq" target="_blank" data-t="navSupport">Support</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <div class="lang-wrap" id="lang-wrap">
+      <button class="lang-btn" onclick="toggleLangMenu()">
+        <span class="lang-flag" id="curr-flag">🇬🇧</span>
+        <span id="curr-lang-label">EN</span>
+        <span style="font-size:.7rem;opacity:.6">▾</span>
+      </button>
+      <div class="lang-drop" id="lang-drop">
+        <div class="lang-option" onclick="setLang('en')"><span>🇬🇧</span> English</div>
+        <div class="lang-option" onclick="setLang('de')"><span>🇩🇪</span> Deutsch</div>
+        <div class="lang-option" onclick="setLang('fr')"><span>🇫🇷</span> Français</div>
+        <div class="lang-option" onclick="setLang('es')"><span>🇪🇸</span> Español</div>
+        <div class="lang-option" onclick="setLang('tr')"><span>🇹🇷</span> Türkçe</div>
+        <div class="lang-option" onclick="setLang('ru')"><span>🇷🇺</span> Русский</div>
+      </div>
+    </div>
+    <button class="btn g sm" id="nav-login-btn" onclick="doLogin()" data-t="login">Login</button>
+    <div class="chip" id="uchip" onclick="location.href='dashboard.html'">
+      <img id="uav" src="" alt=""><span id="uname"></span>
+    </div>
+    <button class="btn g sm" id="nav-logout-btn" style="display:none" onclick="doLogout()" data-t="logout">Logout</button>
+    <a class="btn r sm" href="https://discord.com/oauth2/authorize?client_id=1487514513304584293&permissions=8&scope=bot+applications.commands" target="_blank" data-t="addBot">➕ Add Bot</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+
+<!-- COMING SOON BANNER -->
+<div id="launch-banner" style="background:linear-gradient(90deg,rgba(212,32,96,.15),rgba(245,197,24,.1),rgba(212,32,96,.15));border-bottom:1px solid rgba(245,197,24,.2);padding:.55rem 5%;display:flex;align-items:center;justify-content:space-between;position:fixed;top:60px;left:0;right:0;z-index:499">
+  <div style="display:flex;align-items:center;gap:.75rem;font-size:.82rem">
+    <span style="background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);color:#f5c518;padding:.15rem .6rem;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase">🚀 Coming Soon</span>
+    <span style="color:var(--muted2)">VELTRIX will be the <strong style="color:var(--text)">first public Minecraft PvP tierlist bot</strong> — launching soon on top.gg</span>
+  </div>
+  <button onclick="document.getElementById('launch-banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:.1rem .3rem;line-height:1">✕</button>
+</div>
+<section class="hero" style="padding-top:110px;">
+  <div class="hero-grid"></div>
+  <div class="hc">
+    <div class="badge" data-t="heroBadge">🔥 Minecraft PvP Discord Bot</div>
+    <h1><em data-t="heroEm">VELTRIX.</em></h1>
+    <p class="hsub" data-t="heroSub">VELTRIX is a powerful all-in-one Discord bot. Whether you run a PvP server or a regular community — there is something for everyone.</p>
+    <p class="hsub2" data-t="heroNote">Even if your server has nothing to do with tier testing, VELTRIX has dozens of useful features: anti-nuke, tickets, applications, welcome messages, giveaways and more.</p>
+    <div class="hbtns">
+      <a class="btn r lg" href="https://discord.com/oauth2/authorize?client_id=1487514513304584293&permissions=8&scope=bot+applications.commands" target="_blank" data-t="addFree">➕ Add to Server — Free</a>
+      <button class="btn d lg" onclick="goDash()" id="dash-hero-btn">
+        🖥️ <span data-t="openDash">Open Dashboard</span>
+      </button>
+    </div>
+    <div class="stats">
+      <div><span class="sn">11</span><span class="sl" data-t="s1">Tier Ranks</span></div>
+      <div><span class="sn">50+</span><span class="sl" data-t="s2">Commands</span></div>
+      <div><span class="sn">8</span><span class="sl" data-t="s3">Gamemodes</span></div>
+      <div><span class="sn" data-t="s4n">Free</span><span class="sl" data-t="s4">Forever</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip"><div class="strip-inner" id="feat-strip">
+  <div class="tb" style="background:rgba(212,32,96,.13);color:#ff799e;">🛡️ Anti-Nuke Protection</div>
+  <div class="tb" style="background:rgba(17,136,221,.13);color:#44aaff;">⚔️ Tier Test System</div>
+  <div class="tb" style="background:rgba(30,204,110,.13);color:#1ecc6e;">🎫 Ticket System</div>
+  <div class="tb" style="background:rgba(245,197,24,.13);color:#f5c518;">🤖 AI Support Channel</div>
+  <div class="tb" style="background:rgba(153,31,204,.13);color:#cc66ff;">📋 Applications</div>
+  <div class="tb" style="background:rgba(221,85,17,.13);color:#ff7733;">👋 Welcome Messages</div>
+  <div class="tb" style="background:rgba(17,170,136,.13);color:#22ddaa;">✅ IGN Verification</div>
+  <div class="tb" style="background:rgba(88,101,242,.13);color:#8899ff;">🎁 Giveaways</div>
+  <div class="tb" style="background:rgba(212,32,96,.13);color:#ff799e;">⚠️ Anti-Raid</div>
+  <div class="tb" style="background:rgba(17,136,221,.13);color:#44aaff;">🎥 Clip Analysis</div>
+  <div class="tb" style="background:rgba(30,204,110,.13);color:#1ecc6e;">🛠️ Moderation</div>
+  <div class="tb" style="background:rgba(245,197,24,.13);color:#f5c518;">🌍 Multi-Server</div>
+  <!-- duplicate for loop -->
+  <div class="tb" style="background:rgba(212,32,96,.13);color:#ff799e;">🛡️ Anti-Nuke Protection</div>
+  <div class="tb" style="background:rgba(17,136,221,.13);color:#44aaff;">⚔️ Tier Test System</div>
+  <div class="tb" style="background:rgba(30,204,110,.13);color:#1ecc6e;">🎫 Ticket System</div>
+  <div class="tb" style="background:rgba(245,197,24,.13);color:#f5c518;">🤖 AI Support Channel</div>
+  <div class="tb" style="background:rgba(153,31,204,.13);color:#cc66ff;">📋 Applications</div>
+  <div class="tb" style="background:rgba(221,85,17,.13);color:#ff7733;">👋 Welcome Messages</div>
+  <div class="tb" style="background:rgba(17,170,136,.13);color:#22ddaa;">✅ IGN Verification</div>
+  <div class="tb" style="background:rgba(88,101,242,.13);color:#8899ff;">🎁 Giveaways</div>
+  <div class="tb" style="background:rgba(212,32,96,.13);color:#ff799e;">⚠️ Anti-Raid</div>
+  <div class="tb" style="background:rgba(17,136,221,.13);color:#44aaff;">🎥 Clip Analysis</div>
+  <div class="tb" style="background:rgba(30,204,110,.13);color:#1ecc6e;">🛠️ Moderation</div>
+  <div class="tb" style="background:rgba(245,197,24,.13);color:#f5c518;">🌍 Multi-Server</div>
+</div></div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="rv">
+    <div class="sec-tag" data-t="featTag">Features</div>
+    <div class="sec-h" data-t="featH">Works for Any Discord Server</div>
+    <div class="sec-s" data-t="featS">Not just for PvP. Every feature works independently — use only what you need.</div>
+  </div>
+  <div class="fg rv rv2">
+    <div class="fc"><span class="fi">⚔️</span><h3 data-t="f1h">Tier Test System</h3><p data-t="f1p">Queue, waitlist, private sessions, automatic role assignment. First to 3 wins format.</p></div>
+    <div class="fc"><span class="fi">🛡️</span><h3 data-t="f2h">Anti-Nuke</h3><p data-t="f2p">Real-time protection against mass bans, channel deletes and webhook spam.</p></div>
+    <div class="fc"><span class="fi">🎫</span><h3 data-t="f3h">Ticket System</h3><p data-t="f3p">Support, partner, report and training tickets. Staff ping, transcripts, close button.</p></div>
+    <div class="fc"><span class="fi">📋</span><h3 data-t="f4h">Applications</h3><p data-t="f4p">Staff, media, partner and custom forms. AI text detection and copy-paste warnings.</p></div>
+    <div class="fc"><span class="fi">🤖</span><h3 data-t="f5h">AI Support</h3><p data-t="f5p">Built-in AI answers questions in #ai-support automatically. No API key needed.</p></div>
+    <div class="fc"><span class="fi">👋</span><h3 data-t="f6h">Welcome & Leave</h3><p data-t="f6p">Custom embeds with {user}, {server}, {count} placeholders. Per-server config.</p></div>
+    <div class="fc"><span class="fi">🎁</span><h3 data-t="f7h">Giveaways</h3><p data-t="f7p">/giveaway with timer, entry buttons and automatic winner draw.</p></div>
+    <div class="fc"><span class="fi">✅</span><h3 data-t="f8h">IGN Verification</h3><p data-t="f8p">Per-server Minecraft username verification. Unverify button + staff command.</p></div>
+    <div class="fc"><span class="fi">🔧</span><h3 data-t="f9h">Guided Setup</h3><p data-t="f9p">Every setup command shows what it does and asks Yes/No before any changes.</p></div>
+    <div class="fc"><span class="fi">🛠️</span><h3 data-t="f10h">Full Moderation</h3><p data-t="f10p">/ban /kick /mute /warn with DMs. Auto-mod, purge, blacklist included.</p></div>
+    <div class="fc"><span class="fi">🎥</span><h3 data-t="f11h">Clip Analysis</h3><p data-t="f11p">Submit a clip URL + round — bot generates cheat checklists and tier guides.</p></div>
+    <div class="fc"><span class="fi">🌍</span><h3 data-t="f12h">Multi-Server</h3><p data-t="f12p">Fully independent per server — queue, config, verification and tickets separate.</p></div>
+  </div>
+</section>
+
+<!-- BOT STATUS + LEADERBOARD -->
+<section id="status" class="bg2">
+  <div class="rv"><div class="sec-tag" data-t="statusTag">Bot Status</div><div class="sec-h" data-t="statusH">Live & Online</div></div>
+  <div class="status-card rv rv2">
+    <div class="sav">⚔️<div class="sdot"></div></div>
+    <div class="sinfo">
+      <h3>VELTRIX</h3>
+      <p>ID: 1487514513304584293</p>
+      <div class="spill">● <span data-t="statusOnline">Online & Operational</span></div>
+    </div>
+    <div class="sstats">
+      <div class="ssi"><span class="ssn">∞</span><span class="ssl" data-t="ssServers">Servers</span></div>
+      <div class="ssi"><span class="ssn">50+</span><span class="ssl" data-t="ssCmds">Commands</span></div>
+      <div class="ssi"><span class="ssn">Free</span><span class="ssl" data-t="ssPlan">Plan</span></div>
+      <div class="ssi"><span class="ssn">99%</span><span class="ssl" data-t="ssUptime">Uptime</span></div>
+    </div>
+  </div>
+  <div class="rv"><div class="sec-tag" data-t="lbTag">Leaderboard</div><div class="sec-h" data-t="lbH">Top 10 Servers</div></div>
+  <div class="lb-list rv rv2">
+    <div class="lb-item"><div class="lb-rank gold">🥇</div><div class="lb-ico">🏆</div><div style="flex:1"><div class="lb-name">VELTRIX Community</div><div class="lb-sub" data-t="lbOf">Official Server</div></div><div class="lb-badge" data-t="lbOfBadge">Official ⭐</div></div>
+    <div class="lb-item"><div class="lb-rank silver">2</div><div class="lb-ico">⚔️</div><div style="flex:1"><div class="lb-name">TierSMP Private</div><div class="lb-sub">Active tier testing community</div></div></div>
+    <div class="lb-item"><div class="lb-rank bronze">3</div><div class="lb-ico">🌩️</div><div style="flex:1"><div class="lb-name">Storm-Tiers</div><div class="lb-sub">PvP ranking community</div></div></div>
+    <div class="lb-item"><div class="lb-rank">4</div><div class="lb-ico">⚡</div><div style="flex:1"><div class="lb-name">Swift PvP</div><div class="lb-sub">Competitive PvP server</div></div></div>
+    <div class="lb-item"><div class="lb-rank">5</div><div class="lb-ico">🌙</div><div style="flex:1"><div class="lb-name">Luna SMP</div><div class="lb-sub">SMP with tier tests</div></div></div>
+    <div class="lb-item"><div class="lb-rank">6</div><div class="lb-ico">⛏️</div><div style="flex:1"><div class="lb-name">MineRise</div><div class="lb-sub">Minecraft PvP community</div></div></div>
+    <div class="lb-item"><div class="lb-rank">7</div><div class="lb-ico">📝</div><div style="flex:1"><div class="lb-name">Written APPs | Tier SMP</div><div class="lb-sub">Application-based tier server</div></div></div>
+    <div class="lb-item"><div class="lb-rank">8</div><div class="lb-ico">💀</div><div style="flex:1"><div class="lb-name">InvisMafia</div><div class="lb-sub">Competitive gaming community</div></div></div>
+    <div class="lb-item"><div class="lb-rank">9</div><div class="lb-ico">🎮</div><div style="flex:1"><div class="lb-name">BasachiMC</div><div class="lb-sub">MC community server</div></div></div>
+    <div class="lb-item"><div class="lb-rank">10</div><div class="lb-ico">⭐</div><div style="flex:1"><div class="lb-name" data-t="lbYou">Your Server — Add VELTRIX!</div><div class="lb-sub" data-t="lbYouSub">Be part of the top 10</div></div><a class="btn r sm" href="https://discord.com/oauth2/authorize?client_id=1487514513304584293&permissions=8&scope=bot+applications.commands" target="_blank">➕</a></div>
+  </div>
+</section>
+
+<!-- CAPS -->
+<section id="caps">
+  <div class="rv"><div class="sec-tag" data-t="capsTag">Capabilities</div><div class="sec-h" data-t="capsH">Six Powerful Modules</div><div class="sec-s" data-t="capsS">Enable only what you need. All modules work independently.</div></div>
+  <div class="cg">
+    <div class="cc rv"><span class="ci">⚔️</span><h4 data-t="c1h">Tier Testing</h4><ul><li data-t="c1a">Waitlist + live queue</li><li data-t="c1b">Private test channels</li><li data-t="c1c">First to 3 wins</li><li data-t="c1d">Auto role assignment</li><li data-t="c1e">HT3+ epic embeds</li><li data-t="c1f">MC skin in result</li><li data-t="c1g">Region warnings</li></ul></div>
+    <div class="cc rv rv2"><span class="ci">🛡️</span><h4 data-t="c2h">Anti-Nuke</h4><ul><li data-t="c2a">Real-time monitoring</li><li data-t="c2b">Configurable limits</li><li data-t="c2c">Webhook detection</li><li data-t="c2d">Auto kick/ban/de-op</li><li data-t="c2e">24h automated scans</li><li data-t="c2f">One-click lockdown</li><li data-t="c2g">Danger score system</li></ul></div>
+    <div class="cc rv rv3"><span class="ci">🎫</span><h4 data-t="c3h">Tickets</h4><ul><li data-t="c3a">Custom ticket panels</li><li data-t="c3b">Partner ticket flow</li><li data-t="c3c">Report with MC skin</li><li data-t="c3d">Free training tickets</li><li data-t="c3e">HT re-test apps</li><li data-t="c3f">Auto transcripts</li></ul></div>
+    <div class="cc rv rv2"><span class="ci">📋</span><h4 data-t="c4h">Applications</h4><ul><li data-t="c4a">Staff, Media, Partner, TT</li><li data-t="c4b">Custom forms</li><li data-t="c4c">AI + copy detection</li><li data-t="c4d">Accept / Deny buttons</li><li data-t="c4e">Auto role on accept</li><li data-t="c4f">#staff-movement posts</li></ul></div>
+    <div class="cc rv rv3"><span class="ci">🛠️</span><h4 data-t="c5h">Moderation</h4><ul><li data-t="c5a">/ban /kick /mute + DMs</li><li data-t="c5b">Warning system</li><li data-t="c5c">Auto-mod + ad removal</li><li data-t="c5d">Bulk purge</li><li data-t="c5e">Security scan</li><li data-t="c5f">Channel lockdown</li></ul></div>
+    <div class="cc rv rv4"><span class="ci">🎁</span><h4 data-t="c6h">Rewards</h4><ul><li data-t="c6a">Invite tracking</li><li data-t="c6b">5 invites = free training</li><li data-t="c6c">Giveaways + auto-draw</li><li data-t="c6d">Welcome / leave msgs</li><li data-t="c6e">OG role claiming</li><li data-t="c6f">Soundboard detection</li></ul></div>
+  </div>
+</section>
+
+<!-- DASHBOARD PROMO -->
+<section id="dashboard" class="bg2">
+  <div class="rv">
+    <div class="sec-tag" data-t="dashTag">Dashboard</div>
+    <div class="sec-h" data-t="dashH">Configure From the Website</div>
+    <div class="sec-s" data-t="dashS">The dashboard is on this website — no Discord commands needed. Login to manage all your servers visually.</div>
+  </div>
+  <div class="dash-promo rv rv2">
+    <div class="mockup">
+      <div class="mock-bar">
+        <div class="mdot" style="background:#ff5f57"></div>
+        <div class="mdot" style="background:#ffbd2e"></div>
+        <div class="mdot" style="background:#28ca41"></div>
+        <span class="mock-url">veltrix.netlify.app/dashboard.html</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-side">
+          <div class="mock-sect">Overview</div>
+          <div class="mock-item a">🏠 Overview</div>
+          <div class="mock-sect">Tier Testing</div>
+          <div class="mock-item">⚔️ Tier Testing</div>
+          <div class="mock-item">✅ IGN Verify</div>
+          <div class="mock-sect">Moderation</div>
+          <div class="mock-item">🛡️ Anti-Nuke</div>
+          <div class="mock-item">⚠️ Anti-Raid</div>
+          <div class="mock-item">🤖 Auto-Mod</div>
+          <div class="mock-sect">Community</div>
+          <div class="mock-item">👋 Welcome</div>
+          <div class="mock-item">🎫 Tickets</div>
+          <div class="mock-item">📋 Applications</div>
+          <div class="mock-sect" style="color:#f5c518">Admin</div>
+          <div class="mock-item" style="color:#f5c518">👑 Admin Panel</div>
+        </div>
+        <div class="mock-main">
+          <!-- Stats row -->
+          <div class="mock-row">
+            <div class="mock-stat"><div class="mock-stat-n" style="color:#1ecc6e">2</div><div class="mock-stat-l">Testing Now</div></div>
+            <div class="mock-stat"><div class="mock-stat-n">5</div><div class="mock-stat-l">In Queue</div></div>
+            <div class="mock-stat"><div class="mock-stat-n">HT3</div><div class="mock-stat-l">Last Result</div></div>
+            <div class="mock-stat"><div class="mock-stat-n" style="color:#1ecc6e">ON</div><div class="mock-stat-l">Anti-Nuke</div></div>
+          </div>
+          <!-- Welcome config preview -->
+          <div style="background:var(--panel);border:1px solid var(--border2);border-radius:7px;padding:.5rem .7rem;margin-bottom:.4rem">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.08em">Welcome Message</div>
+            <div style="font-size:.72rem;color:var(--muted2)">Hey <span style="color:#ff799e">{user}</span>! Welcome to <span style="color:#ff799e">{server}</span> 🎉</div>
+          </div>
+          <div class="mock-tog-row"><span class="mock-tog-l">Anti-Nuke Active</span><div class="mock-tog"></div></div>
+          <div class="mock-tog-row"><span class="mock-tog-l">Anti-Raid Protection</span><div class="mock-tog"></div></div>
+          <div class="mock-tog-row"><span class="mock-tog-l">Welcome Messages</span><div class="mock-tog off"></div></div>
+          <div class="mock-tog-row"><span class="mock-tog-l">AI Support Channel</span><div class="mock-tog"></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="df-list">
+        <div class="df"><div class="df-ico">🖥️</div><div><h4 data-t="df1h">See All Your Servers</h4><p data-t="df1p">Login once — see all servers where you have permissions. Click any server to configure.</p></div></div>
+        <div class="df"><div class="df-ico">🔧</div><div><h4 data-t="df2h">Configure Without Commands</h4><p data-t="df2p">Toggle features, set limits, write messages — simple switches and inputs. No slash commands.</p></div></div>
+        <div class="df"><div class="df-ico">🛡️</div><div><h4 data-t="df3h">Anti-Nuke & Moderation</h4><p data-t="df3p">Set max bans/kicks per 5 min, choose action, enable auto-mod — all from one page.</p></div></div>
+        <div class="df"><div class="df-ico">📋</div><div><h4 data-t="df4h">Tickets & Applications</h4><p data-t="df4p">Enable transcripts, staff pings, AI detection — configure everything visually.</p></div></div>
+        <div class="df"><div class="df-ico">💾</div><div><h4 data-t="df5h">Save & Apply Instantly</h4><p data-t="df5p">Click Save — changes apply immediately to your server. No restart needed.</p></div></div>
+      </div>
+      <div class="rec-box">⭐ <strong data-t="recTitle">Recommended:</strong> <span data-t="recText">Configure VELTRIX from the website dashboard — it's easier and faster than using slash commands in Discord.</span></div>
+      <div class="dash-btns">
+        <button class="btn d" onclick="goDash()">
+          🖥️ <span data-t="openDashBtn">Open Dashboard</span>
+        </button>
+        <a class="btn g" href="https://discord.gg/uu9SY6Hq" target="_blank" data-t="supBtn">💬 Support</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="rv"><div class="sec-tag" data-t="howTag">How It Works</div><div class="sec-h" data-t="howH">Up & Running in 60 Seconds</div></div>
+  <div class="steps rv rv2">
+    <div class="step"><div class="snum">1</div><h3 data-t="step1h">Add the Bot</h3><p data-t="step1p">Click Add to Server and grant Administrator permissions.</p></div>
+    <div class="step"><div class="snum">2</div><h3 data-t="step2h">Login Here</h3><p data-t="step2p">Click Login with Discord on this website to access your dashboard.</p></div>
+    <div class="step"><div class="snum">3</div><h3 data-t="step3h">Pick Your Server</h3><p data-t="step3p">See all your servers — click one to open the config panel.</p></div>
+    <div class="step"><div class="snum">4</div><h3 data-t="step4h">Configure Everything</h3><p data-t="step4p">Toggle features, set limits, run /tiertestingsetup if needed.</p></div>
+    <div class="step"><div class="snum">5</div><h3 data-t="step5h">Go Live</h3><p data-t="step5p">/openqueue — players join waitlist. Testers pull with /starttest.</p></div>
+  </div>
+</section>
+
+
+<!-- WHY US -->
+<section id="why" style="background:var(--bg2)">
+  <div class="rv">
+    <div class="sec-tag">Why VELTRIX?</div>
+    <div class="sec-h">The Last Bot You'll Ever Need</div>
+    <div class="sec-s">Other bots hit a wall. Come back to VELTRIX when yours does too — this is the only one that actually has everything, for free.</div>
+  </div>
+  <div class="why-grid">
+    <div class="why-col why-col-bad rv rv2">
+      <div class="why-col-head">❌ &nbsp;Generic Bots</div>
+      <div class="why-row"><div class="why-icon">💸</div><div class="why-txt"><strong>Features locked behind premium</strong><span>Pay for moderation. Pay for anti-nuke. Pay for everything that should just work.</span></div></div>
+      <div class="why-row"><div class="why-icon">🤷</div><div class="why-txt"><strong>No PvP support whatsoever</strong><span>No tier testing, no queue, no rank assignment. Not built for PvP communities.</span></div></div>
+      <div class="why-row"><div class="why-icon">🔓</div><div class="why-txt"><strong>Weak or no real security</strong><span>If someone nukes your server — your current bot won't stop them.</span></div></div>
+      <div class="why-row"><div class="why-icon">⚙️</div><div class="why-txt"><strong>Configure via slash commands only</strong><span>No dashboard. No visual interface. Memorize 30 commands or nothing gets done.</span></div></div>
+      <div class="why-row"><div class="why-icon">🌐</div><div class="why-txt"><strong>English only</strong><span>No localization. Non-English communities are stuck or underserved.</span></div></div>
+      <div class="why-row"><div class="why-icon">🤖</div><div class="why-txt"><strong>No AI integration</strong><span>Basic keyword filters at best. Nothing that actually understands your community.</span></div></div>
+    </div>
+    <div class="why-col why-col-good rv rv3">
+      <div class="why-col-head" style="color:var(--red)">✅ &nbsp;VELTRIX</div>
+      <div class="why-row"><div class="why-icon">🆓</div><div class="why-txt"><strong>100% free — forever, no catch</strong><span>Every feature. Every server. No credit card. No paywall. No premium tier. Ever.</span></div></div>
+      <div class="why-row"><div class="why-icon">⚔️</div><div class="why-txt"><strong>Full PvP tier system built in</strong><span>Queue, waitlist, private sessions, auto-role assignment, 8 gamemodes, MC skin results.</span></div></div>
+      <div class="why-row"><div class="why-icon">🛡️</div><div class="why-txt"><strong>Enterprise-grade anti-nuke</strong><span>Real-time protection, danger scoring, automated 24h scans, one-click lockdown.</span></div></div>
+      <div class="why-row"><div class="why-icon">🖥️</div><div class="why-txt"><strong>Full web dashboard — no commands</strong><span>Configure everything from your browser. Toggle, save, done. Zero slash commands needed.</span></div></div>
+      <div class="why-row"><div class="why-icon">🌍</div><div class="why-txt"><strong>6 languages built in</strong><span>EN · DE · FR · ES · TR · RU — switch any time, no setup, no extra config.</span></div></div>
+      <div class="why-row"><div class="why-icon">🤖</div><div class="why-txt"><strong>Built-in AI support channel</strong><span>Answers questions automatically. No API key, no subscription, no setup. Just works.</span></div></div>
+    </div>
+  </div>
+  <div class="why-bottom rv rv4">
+    <div class="why-stat"><span class="why-sn">100%</span><span class="why-sl">Free Forever</span></div>
+    <div class="why-stat"><span class="why-sn">50+</span><span class="why-sl">Commands</span></div>
+    <div class="why-stat"><span class="why-sn">6</span><span class="why-sl">Languages</span></div>
+    <div class="why-stat"><span class="why-sn">8</span><span class="why-sl">Gamemodes</span></div>
+    <div class="why-stat"><span class="why-sn">99%</span><span class="why-sl">Uptime</span></div>
+  </div>
+</section>
+
+<!-- LOGIN -->
+<section class="login-bg" id="login-area">
+  <div class="lcard rv" id="lcard">
+    <div style="font-size:2.5rem">⚔️</div>
+    <h2 data-t="loginH">Open Your Dashboard</h2>
+    <p data-t="loginP">Login with Discord to manage your servers, configure the bot and access the dashboard — all on this website.</p>
+    <button class="btn d" onclick="doLogin()" style="width:100%;justify-content:center;padding:.65rem">
+      🔐 <span data-t="loginBtn">Login with Discord</span>
+    </button>
+    <p class="lnote" data-t="loginNote">We only request: username, avatar, server list. We never read messages.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="rv">
+    <div class="sec-tag" style="text-align:center" data-t="ctaTag">Get Started</div>
+    <h2 data-t="ctaH">Ready to Upgrade Your Server?</h2>
+    <p data-t="ctaP">Add VELTRIX free — works for any Discord server.</p>
+    <div class="ctabtns">
+      <a class="btn r lg" href="https://discord.com/oauth2/authorize?client_id=1487514513304584293&permissions=8&scope=bot+applications.commands" target="_blank" data-t="ctaAdd">➕ Add VELTRIX — Free</a>
+      <a class="btn g lg" href="https://discord.gg/uu9SY6Hq" target="_blank" data-t="ctaSup">💬 Support Server</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand"><div class="logo">⚔ VELTR<em>IX</em></div><p data-t="footDesc">The professional Discord bot. Free forever. No premium tiers.</p></div>
+    <div class="foot-col"><h5 data-t="footBot">Bot</h5><a href="https://discord.com/oauth2/authorize?client_id=1487514513304584293&permissions=8&scope=bot+applications.commands" target="_blank" data-t="footAdd">Add to Server</a><a href="https://discord.gg/uu9SY6Hq" target="_blank" data-t="footSup">Support Server</a><a onclick="goDash()" data-t="footDash">Dashboard</a></div>
+    <div class="foot-col"><h5 data-t="footSite">Website</h5><a href="#features" data-t="footFeat">Features</a><a href="#caps" data-t="footCap">Capabilities</a><a href="#status" data-t="footStat">Bot Status</a><a href="#dashboard" data-t="footDashL">Dashboard Info</a></div>
+    <div class="foot-col"><h5>Links</h5><a href="https://discord.gg/uu9SY6Hq" target="_blank">Discord</a><a onclick="doLogin()" data-t="footLogin">Login</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 VELTRIX · All rights reserved</span><span data-t="footFree">Free forever · No premium · No paywalls</span></div>
+</footer>
+
+<script>
+/* ══ TRANSLATIONS ══ */
+const I18N = {
+  en:{navFeatures:'Features',navCaps:'Capabilities',navStatus:'Bot Status',navDash:'Dashboard',navSupport:'Support',heroBadge:'🔥 Minecraft PvP Discord Bot',heroTitle:'The Ultimate',heroEm:'VELTRIX.',heroSub:"VELTRIX is a powerful all-in-one Discord bot. Whether you run a PvP server or a regular community — there is something for everyone.",heroNote:"Even if your server has nothing to do with tier testing, VELTRIX has dozens of useful features: anti-nuke, tickets, applications, welcome messages, giveaways and more.",addFree:'➕ Add to Server — Free',openDash:'Open Dashboard',s1:'Tier Ranks',s2:'Commands',s3:'Gamemodes',s4n:'Free',s4:'Forever',login:'Login',logout:'Logout',addBot:'➕ Add Bot',featTag:'FEATURES',featH:'Works for Any Discord Server',featS:'Not just for PvP. Every feature works independently — use only what you need.',f1h:'Tier Test System',f1p:'Queue, waitlist, private sessions, automatic role assignment. First to 3 wins.',f2h:'Anti-Nuke',f2p:'Real-time protection against mass bans, channel deletes and webhook spam.',f3h:'Ticket System',f3p:'Support, partner, report and training tickets. Staff ping, transcripts, close button.',f4h:'Applications',f4p:'Staff, media, partner and custom forms. AI text detection and copy-paste warnings.',f5h:'AI Support',f5p:'Built-in AI answers questions in #ai-support automatically. No API key needed.',f6h:'Welcome & Leave',f6p:'Custom embeds with {user}, {server}, {count} placeholders.',f7h:'Giveaways',f7p:'/giveaway with timer, entry buttons and automatic winner draw.',f8h:'IGN Verification',f8p:'Per-server Minecraft username verification. Unverify button + staff command.',f9h:'Guided Setup',f9p:'Every setup command shows what it does and asks Yes/No before any changes.',f10h:'Full Moderation',f10p:'/ban /kick /mute /warn with DMs. Auto-mod, purge, blacklist included.',f11h:'Clip Analysis',f11p:'Submit a clip URL + round — bot generates cheat checklists and tier guides.',f12h:'Multi-Server',f12p:'Fully independent per server — queue, config, verification and tickets separate.',statusTag:'BOT STATUS',statusH:'Live & Online',statusOnline:'Online & Operational',ssServers:'Servers',ssCmds:'Commands',ssPlan:'Plan',ssUptime:'Uptime',lbTag:'LEADERBOARD',lbH:'Top 10 Servers',lbOf:'Official Server',lbOfBadge:'Official ⭐',lbYou:'Your Server — Add VELTRIX!',lbYouSub:'Be part of the top 10',capsTag:'CAPABILITIES',capsH:'Six Powerful Modules',capsS:'Enable only what you need. All modules work independently.',c1h:'Tier Testing',c1a:'Waitlist + live queue',c1b:'Private test channels',c1c:'First to 3 wins',c1d:'Auto role assignment',c1e:'HT3+ epic embeds',c1f:'MC skin in result',c1g:'Region warnings',c2h:'Anti-Nuke',c2a:'Real-time monitoring',c2b:'Configurable limits',c2c:'Webhook detection',c2d:'Auto kick/ban/de-op',c2e:'24h automated scans',c2f:'One-click lockdown',c2g:'Danger score system',c3h:'Tickets',c3a:'Custom ticket panels',c3b:'Partner ticket flow',c3c:'Report with MC skin',c3d:'Free training tickets',c3e:'HT re-test apps',c3f:'Auto transcripts',c4h:'Applications',c4a:'Staff, Media, Partner, TT',c4b:'Custom forms',c4c:'AI + copy detection',c4d:'Accept / Deny buttons',c4e:'Auto role on accept',c4f:'#staff-movement posts',c5h:'Moderation',c5a:'/ban /kick /mute + DMs',c5b:'Warning system',c5c:'Auto-mod + ad removal',c5d:'Bulk purge',c5e:'Security scan',c5f:'Channel lockdown',c6h:'Rewards',c6a:'Invite tracking',c6b:'5 invites = free training',c6c:'Giveaways + auto-draw',c6d:'Welcome / leave msgs',c6e:'OG role claiming',c6f:'Soundboard detection',dashTag:'DASHBOARD',dashH:'Configure From the Website',dashS:'The dashboard is on this website — no Discord commands needed. Login to manage all your servers visually.',df1h:'See All Your Servers',df1p:'Login once — see all servers where you have permissions. Click any server to configure.',df2h:'Configure Without Commands',df2p:'Toggle features, set limits, write messages — simple switches and inputs. No slash commands.',df3h:'Anti-Nuke & Moderation',df3p:'Set max bans/kicks per 5 min, choose action, enable auto-mod — all from one page.',df4h:'Tickets & Applications',df4p:'Enable transcripts, staff pings, AI detection — configure everything visually.',df5h:'Save & Apply Instantly',df5p:'Click Save — changes apply immediately. No restart needed.',recTitle:'Recommended:',recText:'Configure VELTRIX from the website dashboard — easier and faster than Discord commands.',openDashBtn:'Open Dashboard',supBtn:'💬 Support',howTag:'HOW IT WORKS',howH:'Up & Running in 60 Seconds',step1h:'Add the Bot',step1p:'Click Add to Server and grant Administrator permissions.',step2h:'Login Here',step2p:'Click Login with Discord on this website to access your dashboard.',step3h:'Pick Your Server',step3p:'See all your servers — click one to open the config panel.',step4h:'Configure Everything',step4p:'Toggle features, set limits, run /tiertestingsetup if needed.',step5h:'Go Live',step5p:'/openqueue — players join waitlist. Testers pull with /starttest.',loginH:'Open Your Dashboard',loginP:'Login with Discord to manage your servers, configure the bot and access the dashboard — all on this website.',loginBtn:'Login with Discord',loginNote:'We only request: username, avatar, server list. We never read messages.',ctaTag:'GET STARTED',ctaH:'Ready to Upgrade Your Server?',ctaP:'Add VELTRIX free — works for any Discord server.',ctaAdd:'➕ Add VELTRIX — Free',ctaSup:'💬 Support Server',footDesc:'The professional Discord bot. Free forever. No premium tiers.',footBot:'Bot',footAdd:'Add to Server',footSup:'Support Server',footDash:'Dashboard',footSite:'Website',footFeat:'Features',footCap:'Capabilities',footStat:'Bot Status',footDashL:'Dashboard Info',footLogin:'Login',footFree:'Free forever · No premium · No paywalls'},
+
+  de:{navFeatures:'Features',navCaps:'Fähigkeiten',navStatus:'Bot Status',navDash:'Dashboard',navSupport:'Support',heroBadge:'🔥 Minecraft PvP Discord Bot',heroTitle:'Der ultimative',heroEm:'VELTRIX.',heroSub:'VELTRIX ist ein leistungsstarker All-in-One Discord Bot — egal ob PvP Server oder normale Community, für jeden ist etwas dabei.',heroNote:'Auch wenn dein Server nichts mit Tier Testing zu tun hat, bietet VELTRIX viele nützliche Features: Anti-Nuke, Tickets, Bewerbungen, Willkommensnachrichten, Giveaways und mehr.',addFree:'➕ Zum Server hinzufügen — Kostenlos',openDash:'Dashboard öffnen',s1:'Tier Ränge',s2:'Commands',s3:'Gamemodes',s4n:'Gratis',s4:'Für immer',login:'Anmelden',logout:'Abmelden',addBot:'➕ Bot hinzufügen',featTag:'FEATURES',featH:'Funktioniert für jeden Discord Server',featS:'Nicht nur für PvP. Jedes Feature funktioniert unabhängig — nur aktivieren was du brauchst.',f1h:'Tier Test System',f1p:'Queue, Warteliste, private Sessions, automatische Rollenzuweisung. First to 3 Wins Format.',f2h:'Anti-Nuke',f2p:'Echtzeit-Schutz gegen Massen-Bans, Channel-Löschungen und Webhook-Spam.',f3h:'Ticket System',f3p:'Support, Partner, Report und Training Tickets. Staff Ping, Transkripte, Schließen-Button.',f4h:'Bewerbungen',f4p:'Staff, Media, Partner und eigene Formulare. KI-Texterkennung und Plagiatswarnungen.',f5h:'KI Support',f5p:'Eingebaute KI beantwortet Fragen in #ki-support automatisch. Kein API-Schlüssel nötig.',f6h:'Willkommen & Abschied',f6p:'Eigene Embeds mit {user}, {server}, {count} Platzhaltern. Pro-Server konfigurierbar.',f7h:'Giveaways',f7p:'/giveaway mit Timer, Teilnahme-Button und automatischer Gewinner-Ziehung.',f8h:'IGN Verifizierung',f8p:'Separate Minecraft-Namens-Verifizierung pro Server. Unverify-Button + Staff Command.',f9h:'Geführtes Setup',f9p:'Jeder Setup-Command zeigt was er tut und fragt vorher Ja/Nein.',f10h:'Volle Moderation',f10p:'/ban /kick /mute /warn mit DMs. Auto-Mod, Purge und Blacklist inklusive.',f11h:'Clip Analyse',f11p:'Clip-URL + Runde eingeben — Bot generiert sofort Cheat-Checklisten und Tier-Guides.',f12h:'Multi-Server',f12p:'Vollständig unabhängig pro Server — eigene Queue, Config, Verifizierung und Tickets.',statusTag:'BOT STATUS',statusH:'Live & Online',statusOnline:'Online & Betriebsbereit',ssServers:'Server',ssCmds:'Commands',ssPlan:'Plan',ssUptime:'Uptime',lbTag:'BESTENLISTE',lbH:'Top 10 Server',lbOf:'Offizieller Server',lbOfBadge:'Offiziell ⭐',lbYou:'Dein Server — VELTRIX hinzufügen!',lbYouSub:'Sei Teil der Top 10',capsTag:'FÄHIGKEITEN',capsH:'Sechs leistungsstarke Module',capsS:'Aktiviere nur was du brauchst. Alle Module funktionieren unabhängig.',c1h:'Tier Testing',c1a:'Warteliste + Live Queue',c1b:'Private Test-Channels',c1c:'First to 3 Wins',c1d:'Auto Rollenzuweisung',c1e:'HT3+ epische Embeds',c1f:'MC Skin im Ergebnis',c1g:'Region Warnungen',c2h:'Anti-Nuke',c2a:'Echtzeit Überwachung',c2b:'Konfigurierbare Limits',c2c:'Webhook Erkennung',c2d:'Auto Kick/Ban/De-op',c2e:'24h automatische Scans',c2f:'Ein-Klick Lockdown',c2g:'Danger Score System',c3h:'Tickets',c3a:'Eigene Ticket-Panels',c3b:'Partner Ticket Flow',c3c:'Report mit MC Skin',c3d:'Gratis Training Tickets',c3e:'HT Retest Bewerbungen',c3f:'Auto Transkripte',c4h:'Bewerbungen',c4a:'Staff, Media, Partner, TT',c4b:'Eigene Formulare',c4c:'KI + Plagiatserkennung',c4d:'Annehmen / Ablehnen',c4e:'Auto Rolle bei Accept',c4f:'#staff-movement Beiträge',c5h:'Moderation',c5a:'/ban /kick /mute + DMs',c5b:'Verwarnungssystem',c5c:'Auto-Mod + Werbung',c5d:'Massen-Löschung',c5e:'Sicherheitsscan',c5f:'Channel Lockdown',c6h:'Belohnungen',c6a:'Einladungs-Tracking',c6b:'5 Einladungen = Gratis Training',c6c:'Giveaways + Auto-Ziehung',c6d:'Willkommen / Abschied',c6e:'OG Rolle einfordern',c6f:'Soundboard Erkennung',dashTag:'DASHBOARD',dashH:'Von der Website konfigurieren',dashS:'Das Dashboard ist auf dieser Website — keine Discord Commands nötig. Logge ein und verwalte alle Server visuell.',df1h:'Alle deine Server sehen',df1p:'Einmal einloggen — alle Server sehen wo du Rechte hast. Klicken zum Konfigurieren.',df2h:'Ohne Commands konfigurieren',df2p:'Features ein-/ausschalten, Limits setzen, Nachrichten schreiben — mit einfachen Schaltern.',df3h:'Anti-Nuke & Moderation',df3p:'Max Bans/Kicks pro 5 Min setzen, Aktion wählen, Auto-Mod aktivieren — alles an einem Ort.',df4h:'Tickets & Bewerbungen',df4p:'Transkripte, Staff Pings, KI-Erkennung aktivieren — alles visuell konfigurieren.',df5h:'Sofort speichern & anwenden',df5p:'Speichern klicken — Einstellungen gelten sofort. Kein Neustart nötig.',recTitle:'Empfehlung:',recText:'Konfiguriere VELTRIX über das Website-Dashboard — einfacher und schneller als Discord Commands.',openDashBtn:'Dashboard öffnen',supBtn:'💬 Support',howTag:'SO FUNKTIONIERTS',howH:'In 60 Sekunden startklar',step1h:'Bot hinzufügen',step1p:'Add to Server klicken und Administrator Rechte erteilen.',step2h:'Hier einloggen',step2p:'Login with Discord auf dieser Website klicken für das Dashboard.',step3h:'Server auswählen',step3p:'Alle Server sehen — einen klicken für das Config-Panel.',step4h:'Alles konfigurieren',step4p:'Features aktivieren, Limits setzen, /tiertestingsetup ausführen.',step5h:'Live gehen',step5p:'/openqueue — Spieler treten der Warteliste bei. Tester ziehen mit /starttest.',loginH:'Dashboard öffnen',loginP:'Mit Discord einloggen um Server zu verwalten, den Bot zu konfigurieren und das Dashboard zu nutzen — alles auf dieser Website.',loginBtn:'Mit Discord anmelden',loginNote:'Wir lesen nur: Benutzername, Avatar und Serverliste. Keine Nachrichten.',ctaTag:'LOSLEGEN',ctaH:'Bereit deinen Server aufzuwerten?',ctaP:'VELTRIX kostenlos hinzufügen — funktioniert für jeden Discord Server.',ctaAdd:'➕ VELTRIX hinzufügen — Kostenlos',ctaSup:'💬 Support Server',footDesc:'Der professionelle Discord Bot. Für immer kostenlos. Kein Premium.',footBot:'Bot',footAdd:'Zum Server hinzufügen',footSup:'Support Server',footDash:'Dashboard',footSite:'Website',footFeat:'Features',footCap:'Fähigkeiten',footStat:'Bot Status',footDashL:'Dashboard Info',footLogin:'Anmelden',footFree:'Für immer kostenlos · Kein Premium · Keine Paywalls'},
+
+  fr:{navFeatures:'Fonctionnalités',navCaps:'Capacités',navStatus:'Statut du Bot',navDash:'Tableau de bord',navSupport:'Support',heroBadge:'🔥 Bot Discord Minecraft PvP',heroTitle:'Le Bot PvP',heroEm:'VELTRIX.',heroSub:"VELTRIX est un bot Discord tout-en-un puissant. Que vous gériez un serveur PvP ou une communauté classique — il y en a pour tout le monde.",heroNote:"Même si votre serveur n'a rien à voir avec les tests de tier, VELTRIX a des dizaines de fonctionnalités utiles: anti-nuke, tickets, candidatures, messages de bienvenue, giveaways et plus.",addFree:'➕ Ajouter au Serveur — Gratuit',openDash:'Ouvrir le Tableau de Bord',s1:'Rangs Tier',s2:'Commandes',s3:'Modes de Jeu',s4n:'Gratuit',s4:'Pour Toujours',login:'Connexion',logout:'Déconnexion',addBot:'➕ Ajouter le Bot',featTag:'FONCTIONNALITÉS',featH:'Fonctionne pour Tout Serveur Discord',featS:"Pas uniquement pour le PvP. Chaque fonctionnalité fonctionne indépendamment.",loginH:'Ouvrir Votre Tableau de Bord',loginP:'Connectez-vous avec Discord pour gérer vos serveurs et accéder au tableau de bord.',loginBtn:'Se connecter avec Discord',loginNote:"Nous demandons uniquement: nom d'utilisateur, avatar, liste de serveurs.",ctaH:'Prêt à Améliorer Votre Serveur?',ctaP:'Ajoutez VELTRIX gratuitement — fonctionne pour tout serveur Discord.',ctaAdd:'➕ Ajouter VELTRIX — Gratuit',ctaSup:'💬 Serveur Support',footFree:'Gratuit pour toujours · Sans premium · Sans paywall'},
+
+  es:{navFeatures:'Funciones',navCaps:'Capacidades',navStatus:'Estado del Bot',navDash:'Panel',navSupport:'Soporte',heroBadge:'🔥 Bot de Discord Minecraft PvP',heroTitle:'El Bot PvP',heroEm:'VELTRIX.',heroSub:'VELTRIX es un potente bot de Discord todo en uno. Ya sea que gestiones un servidor PvP o una comunidad normal — hay algo para todos.',heroNote:'Incluso si tu servidor no tiene nada que ver con las pruebas de tier, VELTRIX tiene docenas de funciones útiles: anti-nuke, tickets, solicitudes, mensajes de bienvenida, sorteos y más.',addFree:'➕ Añadir al Servidor — Gratis',openDash:'Abrir Panel',s1:'Rangos Tier',s2:'Comandos',s3:'Modos de Juego',s4n:'Gratis',s4:'Para Siempre',login:'Iniciar Sesión',logout:'Cerrar Sesión',addBot:'➕ Añadir Bot',featTag:'FUNCIONES',featH:'Funciona para Cualquier Servidor Discord',featS:'No solo para PvP. Cada función trabaja de forma independiente.',loginH:'Abre Tu Panel',loginP:'Inicia sesión con Discord para gestionar tus servidores y acceder al panel.',loginBtn:'Iniciar Sesión con Discord',loginNote:'Solo pedimos: nombre de usuario, avatar, lista de servidores.',ctaH:'¿Listo para Mejorar Tu Servidor?',ctaP:'Añade VELTRIX gratis — funciona para cualquier servidor Discord.',ctaAdd:'➕ Añadir VELTRIX — Gratis',ctaSup:'💬 Servidor de Soporte',footFree:'Gratis para siempre · Sin premium · Sin muros de pago'},
+
+  tr:{navFeatures:'Özellikler',navCaps:'Yetenekler',navStatus:'Bot Durumu',navDash:'Panel',navSupport:'Destek',heroBadge:'🔥 Minecraft PvP Discord Botu',heroTitle:'En İyi',heroEm:'VELTRIX.',heroSub:"VELTRIX güçlü bir hepsi bir arada Discord botudur. PvP sunucusu veya normal topluluk — herkes için bir şey var.",heroNote:'Sunucunun tier testle ilgisi olmasa bile, VELTRIX onlarca kullanışlı özellik sunar: anti-nuke, biletler, başvurular, karşılama mesajları, çekilişler ve daha fazlası.',addFree:'➕ Sunucuya Ekle — Ücretsiz',openDash:'Paneli Aç',s1:'Tier Sıraları',s2:'Komutlar',s3:'Oyun Modları',s4n:'Ücretsiz',s4:'Sonsuza Dek',login:'Giriş Yap',logout:'Çıkış Yap',addBot:'➕ Bot Ekle',featTag:'ÖZELLİKLER',featH:'Her Discord Sunucusu İçin Çalışır',featS:'Sadece PvP için değil. Her özellik bağımsız çalışır.',loginH:'Panonuzu Açın',loginP:"Sunucularınızı yönetmek ve panele erişmek için Discord ile giriş yapın.",loginBtn:'Discord ile Giriş Yap',loginNote:'Yalnızca istiyoruz: kullanıcı adı, avatar, sunucu listesi.',ctaH:'Sunucunuzu Yükseltmeye Hazır mısınız?',ctaP:"VELTRIX'i ücretsiz ekleyin — her Discord sunucusu için çalışır.",ctaAdd:'➕ VELTRIX Ekle — Ücretsiz',ctaSup:'💬 Destek Sunucusu',footFree:'Sonsuza Dek Ücretsiz · Premiuma Gerek Yok'},
+
+  ru:{navFeatures:'Функции',navCaps:'Возможности',navStatus:'Статус бота',navDash:'Панель',navSupport:'Поддержка',heroBadge:'🔥 Minecraft PvP Discord Бот',heroTitle:'Лучший',heroEm:'VELTRIX.',heroSub:'VELTRIX — мощный универсальный Discord бот. Будь то PvP сервер или обычное сообщество — здесь найдётся что-то для всех.',heroNote:'Даже если ваш сервер не связан с тир-тестированием, у VELTRIX есть десятки полезных функций: анти-нюк, тикеты, заявки, приветствия, розыгрыши и многое другое.',addFree:'➕ Добавить на сервер — Бесплатно',openDash:'Открыть Панель',s1:'Тиры',s2:'Команды',s3:'Режимы',s4n:'Бесплатно',s4:'Навсегда',login:'Войти',logout:'Выйти',addBot:'➕ Добавить бота',featTag:'ФУНКЦИИ',featH:'Работает для Любого Discord Сервера',featS:'Не только для PvP. Каждая функция работает независимо.',loginH:'Открыть Панель управления',loginP:'Войдите через Discord для управления серверами и доступа к панели.',loginBtn:'Войти через Discord',loginNote:'Мы запрашиваем только: имя пользователя, аватар, список серверов.',ctaH:'Готовы Улучшить Свой Сервер?',ctaP:'Добавьте VELTRIX бесплатно — работает для любого Discord сервера.',ctaAdd:'➕ Добавить VELTRIX — Бесплатно',ctaSup:'💬 Сервер поддержки',footFree:'Бесплатно навсегда · Без премиума · Без пейволла'},
+};
+
+const LANG_META = {en:{flag:'🇬🇧',label:'EN'},de:{flag:'🇩🇪',label:'DE'},fr:{flag:'🇫🇷',label:'FR'},es:{flag:'🇪🇸',label:'ES'},tr:{flag:'🇹🇷',label:'TR'},ru:{flag:'🇷🇺',label:'RU'}};
+let lang = localStorage.getItem('vx_lang')||'en';
+
+function applyLang(l){
+  const T=I18N[l]||I18N.en;
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.getAttribute('data-t');if(T[k]!==undefined)el.textContent=T[k];});
+  document.getElementById('curr-flag').textContent=LANG_META[l].flag;
+  document.getElementById('curr-lang-label').textContent=LANG_META[l].label;
+  document.querySelectorAll('.lang-option').forEach((o,i)=>{
+    const ls=['en','de','fr','es','tr','ru'];
+    o.classList.toggle('active',ls[i]===l);
+  });
+  document.documentElement.lang=l;
+}
+function setLang(l){lang=l;localStorage.setItem('vx_lang',l);applyLang(l);toggleLangMenu();}
+function toggleLangMenu(){document.getElementById('lang-wrap').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!document.getElementById('lang-wrap').contains(e.target))document.getElementById('lang-wrap').classList.remove('open');});
+
+/* ══ THEME ══ */
+let dark=localStorage.getItem('vx_theme')!=='light';
+function toggleTheme(){dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('theme-btn').textContent=dark?'🌙':'☀️';localStorage.setItem('vx_theme',dark?'dark':'light');}
+if(!dark){document.documentElement.setAttribute('data-theme','light');document.getElementById('theme-btn').textContent='☀️';}
+
+/* ══ TIER STRIP ══ */
+// feature strip is static HTML
+
+/* ══ AUTH ══ */
+const CLIENT_ID='1487514513304584293';
+const REDIRECT_URI = window.location.origin + '/';
+const OAUTH = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds`;
+
+function doLogin(){location.href=OAUTH;}
+function doLogout(){localStorage.removeItem('vx_user');localStorage.removeItem('vx_token');localStorage.removeItem('vx_guilds');showLoggedOut();}
+function goDash(){if(localStorage.getItem('vx_user')){location.href='dashboard.html';}else{doLogin();}}
+function showLoggedIn(u){
+  const adminLink = document.getElementById('nav-admin-link');
+  if(adminLink) adminLink.style.display = (u.id === '1137444352843583570') ? 'block' : 'none';
+  const av=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`:'https://cdn.discordapp.com/embed/avatars/0.png';
+  document.getElementById('uav').src=av;document.getElementById('uname').textContent=u.username;
+  document.getElementById('uchip').classList.add('on');
+  if(u.id===CLIENT_ID.slice(0,4)||u.id==='1137444352843583570'){const al=document.getElementById('nav-admin-link');if(al)al.style.display='block';}
+  document.getElementById('nav-login-btn').style.display='none';
+  document.getElementById('nav-logout-btn').style.display='flex';
+  const T=I18N[lang]||I18N.en;
+  document.getElementById('lcard').innerHTML=`
+    <img src="${av}" style="width:72px;height:72px;border-radius:50%;border:2px solid rgba(212,32,96,.35)">
+    <h2>Hey, ${u.username}! 👋</h2>
+    <p style="color:var(--green);font-weight:600;font-size:.9rem">✓ ${lang==='de'?'Angemeldet mit Discord':'Logged in with Discord'}</p>
+    <p style="font-size:.85rem;color:var(--muted2);line-height:1.6">${lang==='de'?'Du bist eingeloggt. Öffne das Dashboard um deinen Server zu konfigurieren.':'You\'re logged in. Open the dashboard to configure your server.'}</p>
+    <button class="btn d" onclick="location.href='dashboard.html'" style="width:100%;justify-content:center;padding:.6rem">🖥️ ${T.openDashBtn||'Open Dashboard'}</button>
+    <button class="btn g" onclick="doLogout()" style="width:100%;justify-content:center">${T.logout||'Logout'}</button>`;
+}
+function showLoggedOut(){document.getElementById('uchip').classList.remove('on');document.getElementById('nav-login-btn').style.display='flex';document.getElementById('nav-logout-btn').style.display='none';}
+async function init(){
+  // Discord sends token in URL hash after OAuth redirect
+  const hash = window.location.hash;
+  if(hash && hash.includes('access_token')){
+    // Remove the # and parse
+    const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+    const tok = params.get('access_token');
+    if(tok){
+      // Clean URL immediately
+      history.replaceState(null, '', window.location.pathname);
+      try{
+        // Fetch user + guilds in parallel
+        const [ures, gres] = await Promise.all([
+          fetch('https://discord.com/api/v10/users/@me', {headers:{Authorization:`Bearer ${tok}`}}),
+          fetch('https://discord.com/api/v10/users/@me/guilds', {headers:{Authorization:`Bearer ${tok}`}})
+        ]);
+        const u = await ures.json();
+        const guilds = await gres.json();
+        if(u && u.id){
+          localStorage.setItem('vx_user', JSON.stringify(u));
+          localStorage.setItem('vx_token', tok);
+          localStorage.setItem('vx_guilds', JSON.stringify(Array.isArray(guilds) ? guilds : []));
+          showLoggedIn(u);
+          // Go to dashboard after successful login
+          location.href = 'dashboard.html';
+          return;
+        }
+      }catch(err){
+        console.error('Discord auth error:', err);
+      }
+    }
+  }
+  // Restore session from localStorage
+  const saved = localStorage.getItem('vx_user');
+  if(saved) try{ showLoggedIn(JSON.parse(saved)); }catch(e){}
+}
+init();
+applyLang(lang);
+
+/* ══ REVEAL ══ */
+const obs=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.07});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

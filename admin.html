@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — VELTRIX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090f;--bg2:#0d0d1a;--bg3:#111120;
+  --s1:#0f0f1e;--s2:#161628;--s3:#1c1c32;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
+  --t1:#e8e8f8;--t2:#9898c0;--t3:#5a5a80;
+  --red:#d42060;--red2:#ff3575;--green:#1ecc6e;--blue:#4a90f0;--gold:#f5c518;--purple:#9966ff;
+}
+[data-theme=light]{
+  --bg:#f0f0f8;--bg2:#e6e6f2;--bg3:#dcdce8;
+  --s1:#fff;--s2:#f5f5fc;--s3:#ededf8;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);
+  --t1:#0d0d1a;--t2:#555580;--t3:#9090b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);display:flex;flex-direction:column;}
+a{text-decoration:none;color:inherit;}
+
+/* topbar */
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;background:var(--s1);border-bottom:1px solid rgba(245,197,24,.12);flex-shrink:0;z-index:100;}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.28rem;font-weight:700;letter-spacing:.1em;cursor:pointer;}
+.logo em{color:var(--red);font-style:normal;}
+.admin-badge{display:inline-flex;align-items:center;gap:.35rem;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.25);color:var(--gold);padding:.2rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;animation:gbadge 3s ease-in-out infinite;}
+@keyframes gbadge{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 10px 2px rgba(245,197,24,.14)}}
+.tb-right{display:flex;align-items:center;gap:.5rem;}
+.chip{display:flex;align-items:center;gap:.38rem;background:var(--s2);border:1px solid var(--b1);padding:.18rem .65rem .18rem .28rem;border-radius:20px;font-size:.8rem;font-weight:500;}
+.chip img{width:22px;height:22px;border-radius:50%;object-fit:cover;}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .85rem;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:all .18s;}
+.btn-gold{background:var(--gold);color:#0a0a0a;}.btn-gold:hover{background:#ffe066;box-shadow:0 4px 14px rgba(245,197,24,.3);}
+.btn-ghost{background:transparent;border:1px solid var(--b1);color:var(--t2);}.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:var(--red2);}
+.btn-sm{padding:.3rem .7rem;font-size:.75rem;}
+.icon-btn{background:none;border:1px solid var(--b1);border-radius:7px;padding:.28rem .48rem;font-size:.9rem;cursor:pointer;color:var(--t2);line-height:1;transition:all .18s;}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* layout */
+.app{flex:1;display:flex;overflow:hidden;}
+
+/* sidebar */
+.sidebar{width:232px;background:var(--s1);border-right:1px solid rgba(245,197,24,.08);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sb-hdr{padding:.9rem 1rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.65rem;flex-shrink:0;}
+.sb-hico{width:36px;height:36px;border-radius:9px;background:rgba(245,197,24,.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.sb-htitle{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:700;color:var(--gold);letter-spacing:.05em;}
+.sb-hsub{font-size:.7rem;color:var(--t3);}
+.sb-nav{flex:1;overflow-y:auto;padding:.4rem 0;}
+.sb-nav::-webkit-scrollbar{width:3px;}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+.sb-sec{font-size:.59rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:.55rem 1rem .18rem;}
+.sb-item{display:flex;align-items:center;gap:.55rem;padding:.42rem 1rem;font-size:.81rem;font-weight:500;color:var(--t2);cursor:pointer;transition:all .14s;border-left:2px solid transparent;user-select:none;white-space:nowrap;}
+.sb-item:hover{background:rgba(255,255,255,.03);color:var(--t1);}
+.sb-item.on{background:rgba(245,197,24,.09);color:var(--gold);border-left-color:var(--gold);font-weight:600;}
+.sb-item.danger{color:#ff6666;}.sb-item.danger:hover{background:rgba(220,17,17,.07);color:#ff4444;}
+.si{font-size:.86rem;width:17px;text-align:center;flex-shrink:0;}
+.sb-foot{padding:.75rem 1rem;border-top:1px solid var(--b1);font-size:.68rem;color:var(--t3);line-height:1.55;flex-shrink:0;}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.main-bar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:var(--bg);border-bottom:1px solid var(--b1);flex-shrink:0;}
+.main-title{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;display:flex;align-items:center;gap:.45rem;}
+.main-bar-right{display:flex;align-items:center;gap:.5rem;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.45)}}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+
+/* panels */
+.panel{display:none;padding:1.5rem;}
+.panel.on{display:block;}
+
+/* stat cards */
+.ov-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.65rem;margin-bottom:1rem;}
+.ov-card{border-radius:11px;padding:.9rem 1rem;border:1px solid transparent;position:relative;overflow:hidden;}
+.ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;}
+.ov-card.g{background:rgba(30,204,110,.07);border-color:rgba(30,204,110,.17);}.ov-card.g::before{background:var(--green);}.ov-card.g .ov-n{color:var(--green);}
+.ov-card.b{background:rgba(74,144,240,.07);border-color:rgba(74,144,240,.17);}.ov-card.b::before{background:var(--blue);}.ov-card.b .ov-n{color:var(--blue);}
+.ov-card.r{background:rgba(212,32,96,.07);border-color:rgba(212,32,96,.17);}.ov-card.r::before{background:var(--red);}.ov-card.r .ov-n{color:var(--red2);}
+.ov-card.gold{background:rgba(245,197,24,.06);border-color:rgba(245,197,24,.15);}.ov-card.gold::before{background:var(--gold);}.ov-card.gold .ov-n{color:var(--gold);}
+.ov-card.p{background:rgba(153,102,255,.06);border-color:rgba(153,102,255,.15);}.ov-card.p::before{background:var(--purple);}.ov-card.p .ov-n{color:#bb99ff;}
+.ov-n{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;line-height:1;display:block;}
+.ov-l{font-size:.71rem;color:var(--t2);margin-top:.2rem;display:block;}
+.ov-sub{font-size:.67rem;color:var(--t3);display:block;margin-top:.08rem;}
+
+/* config cards */
+.cc{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:1.3rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.cc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold) 50%,transparent);opacity:0;transition:opacity .3s;}
+.cc:hover::after{opacity:.45;}
+.cc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--b1);}
+.cc-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:.45rem;}
+.cc-desc{font-size:.77rem;color:var(--t2);margin-top:.18rem;}
+.cc h3{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.05em;margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.45rem;}
+
+/* search */
+.search-row{display:flex;align-items:center;gap:.7rem;margin-bottom:1.25rem;}
+.search-in{flex:1;background:var(--s1);border:1px solid var(--b1);border-radius:9px;padding:.52rem 1rem;color:var(--t1);font-size:.84rem;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;}
+.search-in:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,24,.1);}
+.search-in::placeholder{color:var(--t3);}
+
+/* servers grid */
+.srv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:.7rem;}
+.srv-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s;}
+.srv-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,197,24,.09);}
+.sc-ico{width:44px;height:44px;border-radius:11px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;overflow:hidden;}
+.sc-ico img{width:44px;height:44px;border-radius:11px;object-fit:cover;}
+.sc-name{font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sc-id{font-size:.69rem;color:var(--t3);margin-top:.1rem;font-family:monospace;}
+.badge{display:inline-flex;align-items:center;gap:.22rem;padding:.1rem .45rem;border-radius:10px;font-size:.7rem;font-weight:600;margin-top:.32rem;}
+.b-admin{background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.18);}
+.b-green{background:rgba(30,204,110,.1);color:var(--green);border:1px solid rgba(30,204,110,.18);}
+.b-red{background:rgba(212,32,96,.1);color:var(--red2);border:1px solid rgba(212,32,96,.18);}
+.b-blue{background:rgba(74,144,240,.1);color:#7ab4ff;border:1px solid rgba(74,144,240,.18);}
+.b-gold{background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.18);}
+.b-muted{background:rgba(90,90,130,.1);color:var(--t2);border:1px solid var(--b1);}
+
+/* activity feed */
+.act-feed{display:flex;flex-direction:column;gap:.5rem;max-height:380px;overflow-y:auto;}
+.act-feed::-webkit-scrollbar{width:3px;}
+.act-feed::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+.act-item{background:var(--bg2);border:1px solid var(--b1);border-radius:9px;padding:.62rem .88rem;display:flex;align-items:flex-start;gap:.72rem;transition:background .16s,border-color .16s;}
+.act-item:hover{background:var(--s1);border-color:rgba(245,197,24,.15);}
+.act-body{flex:1;min-width:0;}
+.act-title{font-size:.82rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.act-meta{font-size:.71rem;color:var(--t2);margin-top:.1rem;}
+.act-time{font-size:.69rem;color:var(--t3);flex-shrink:0;white-space:nowrap;}
+
+/* server manage */
+.smg-hdr{display:flex;align-items:center;gap:.95rem;padding:1.2rem;background:var(--s1);border:1px solid rgba(245,197,24,.14);border-radius:12px;margin-bottom:1rem;}
+.smg-ico{width:50px;height:50px;border-radius:12px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;overflow:hidden;}
+.smg-ico img{width:50px;height:50px;border-radius:12px;object-fit:cover;}
+.smg-name{font-family:'Rajdhani',sans-serif;font-size:1.25rem;font-weight:700;}
+.smg-id{font-size:.7rem;color:var(--t3);font-family:monospace;margin-top:.08rem;}
+.smg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem;}
+.smg-stat{background:var(--bg2);border-radius:9px;padding:.78rem;text-align:center;}
+.smg-stat-n{font-family:'Rajdhani',sans-serif;font-size:1.35rem;font-weight:700;}
+.smg-stat-l{font-size:.67rem;color:var(--t3);margin-top:.08rem;}
+
+/* data table */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.tbl th{text-align:left;padding:.44rem .72rem;color:var(--t3);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--b1);}
+.tbl td{padding:.58rem .72rem;border-bottom:1px solid rgba(255,255,255,.03);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+
+/* blacklist */
+.bl-item{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:.58rem .88rem;display:flex;align-items:center;gap:.72rem;margin-bottom:.42rem;transition:border-color .16s;}
+.bl-item:hover{border-color:rgba(220,17,17,.22);}
+.bl-id{font-family:monospace;font-size:.81rem;flex:1;color:var(--t2);}
+.bl-del{background:rgba(220,17,17,.1);color:#ff4444;border:1px solid rgba(220,17,17,.2);border-radius:5px;padding:.2rem .52rem;font-size:.72rem;cursor:pointer;font-family:inherit;transition:background .15s;}
+.bl-del:hover{background:rgba(220,17,17,.2);}
+
+/* forms */
+.fg{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.8rem;}
+.fl{font-size:.69rem;font-weight:700;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;padding:.48rem .78rem;color:var(--t1);font-size:.845rem;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,24,.09);}
+input::placeholder,textarea::placeholder{color:var(--t3);}
+textarea{resize:vertical;min-height:78px;line-height:1.55;}
+select option{background:var(--bg2);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+
+/* toggles */
+.tog{display:flex;align-items:center;justify-content:space-between;padding:.68rem .4rem;border-bottom:1px solid var(--b1);border-radius:6px;gap:.75rem;transition:background .14s;}
+.tog:last-child{border-bottom:none;}
+.tog:hover{background:rgba(255,255,255,.025);}
+.tog h4{font-size:.845rem;font-weight:500;}
+.tog p{font-size:.74rem;color:var(--t2);margin-top:.1rem;line-height:1.5;}
+.sw{position:relative;width:40px;height:22px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw-t{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:22px;cursor:pointer;transition:.25s;}
+.sw-t::before{content:'';position:absolute;left:3px;bottom:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+input:checked+.sw-t{background:var(--gold);}
+input:checked+.sw-t::before{transform:translateX(18px);}
+
+/* top servers */
+.top-row{display:flex;align-items:center;gap:.8rem;padding:.65rem .82rem;border-radius:9px;border:1px solid var(--b1);background:var(--bg2);margin-bottom:.42rem;transition:border-color .16s;}
+.top-row:hover{border-color:rgba(245,197,24,.2);}
+.top-rank{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:var(--t3);width:18px;text-align:center;flex-shrink:0;}
+.top-rank.g1{color:var(--gold);}
+.top-rank.g2{color:#c0c0c0;}
+.top-rank.g3{color:#cd7f32;}
+.top-ico{width:30px;height:30px;border-radius:8px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.82rem;overflow:hidden;}
+.top-ico img{width:30px;height:30px;border-radius:8px;object-fit:cover;}
+.top-name{flex:1;font-size:.83rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.top-stat{font-size:.74rem;color:var(--t2);flex-shrink:0;}
+
+/* toast */
+.toast{position:fixed;bottom:1.75rem;right:1.75rem;padding:.58rem 1.1rem;border-radius:9px;font-size:.82rem;font-weight:600;transform:translateY(120px);opacity:0;transition:.3s;z-index:9999;display:flex;align-items:center;gap:.45rem;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);color:#071a0e;}
+.toast.err{background:#dd2222;color:#fff;}
+.toast.info{background:var(--gold);color:#0a0a0a;}
+
+/* danger */
+.danger-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid rgba(220,17,17,.12);border-radius:10px;padding:.85rem 1rem;margin-bottom:.52rem;transition:border-color .18s;}
+.danger-row:hover{border-color:rgba(220,17,17,.28);}
+.danger-row h4{font-size:.87rem;font-weight:600;}
+.danger-row p{font-size:.75rem;color:var(--t2);margin-top:.07rem;}
+.btn-danger{background:rgba(220,17,17,.1);color:#ff4444;border:1px solid rgba(220,17,17,.25);border-radius:7px;padding:.33rem .75rem;font-size:.77rem;font-weight:600;cursor:pointer;font-family:inherit;margin-left:1rem;flex-shrink:0;transition:background .16s;}
+.btn-danger:hover{background:rgba(220,17,17,.2);}
+
+/* modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--s1);border:1px solid rgba(245,197,24,.2);border-radius:16px;padding:2rem;max-width:520px;width:90%;position:relative;max-height:85vh;overflow-y:auto;animation:mIn .22s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h3{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1.25rem;}
+.modal-x{position:absolute;top:.9rem;right:.9rem;background:none;border:none;color:var(--t3);font-size:1.1rem;cursor:pointer;padding:.2rem .4rem;border-radius:5px;transition:all .14s;}
+.modal-x:hover{background:var(--s2);color:var(--t1);}
+
+/* no access */
+.no-access{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;text-align:center;padding:2rem;}
+.no-access h2{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;}
+.no-access p{color:var(--t2);font-size:.9rem;max-width:300px;line-height:1.6;}
+
+@media(max-width:768px){.panel{padding:1rem;}.fr{grid-template-columns:1fr!important;}.ov-row{grid-template-columns:1fr 1fr;}.smg-stats{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="no-access" id="no-access" style="display:none">
+  <div style="font-size:3.5rem">🔒</div>
+  <h2>Admin Access Only</h2>
+  <p>This panel is restricted to VELTRIX bot administrators.</p>
+  <button class="btn btn-ghost" onclick="location.href='index.html'" style="margin-top:.5rem">← Back to Website</button>
+</div>
+
+<div id="main-ui" style="display:none;flex-direction:column;height:100%">
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:.7rem">
+    <div class="logo" onclick="location.href='index.html'">⚔ VELTR<em>IX</em></div>
+    <div class="admin-badge">👑 Admin Panel</div>
+  </div>
+  <div class="tb-right">
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <div class="chip"><img id="user-av" src="" alt=""><span id="user-name">…</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='dashboard.html'">Dashboard</button>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-hdr">
+      <div class="sb-hico">👑</div>
+      <div><div class="sb-htitle">Admin Panel</div><div class="sb-hsub">Full bot control</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Overview</div>
+      <div class="sb-item on" data-p="overview" onclick="nav(this)"><span class="si">📊</span> Dashboard</div>
+      <div class="sb-item" data-p="live" onclick="nav(this)"><span class="si"><span class="live-dot" style="width:6px;height:6px"></span></span> Live Activity</div>
+      <div class="sb-sec">Servers</div>
+      <div class="sb-item" data-p="all-servers" onclick="nav(this)"><span class="si">🌐</span> All Bot Servers</div>
+      <div class="sb-item" data-p="server-mgmt" onclick="nav(this)" id="srv-mgmt-tab" style="display:none"><span class="si">⚙️</span> Manage Server</div>
+      <div class="sb-sec">Users</div>
+      <div class="sb-item" data-p="logins" onclick="nav(this)"><span class="si">👥</span> Login History</div>
+      <div class="sb-item" data-p="blacklist" onclick="nav(this)"><span class="si">🚫</span> Blacklist</div>
+      <div class="sb-item" data-p="user-lookup" onclick="nav(this)"><span class="si">🔍</span> User Lookup</div>
+      <div class="sb-sec">Bot</div>
+      <div class="sb-item" data-p="bot-config" onclick="nav(this)"><span class="si">🤖</span> Bot Config</div>
+      <div class="sb-item" data-p="announcements" onclick="nav(this)"><span class="si">📢</span> Announcements</div>
+      <div class="sb-item danger" data-p="danger" onclick="nav(this)"><span class="si">⚠️</span> Danger Zone</div>
+    </nav>
+    <div class="sb-foot">Logged in as admin.<br>Changes apply immediately.</div>
+  </div>
+
+  <div class="main">
+    <div class="main-bar">
+      <div class="main-title" id="panel-title">📊 Dashboard</div>
+      <div class="main-bar-right">
+        <span style="font-size:.75rem;color:var(--t3);display:flex;align-items:center;gap:.35rem"><span class="live-dot"></span> Live</span>
+        <button onclick="refreshStats()" class="btn btn-ghost btn-sm">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="scroll">
+
+      <!-- OVERVIEW -->
+      <div class="panel on" id="panel-overview">
+        <div class="ov-row">
+          <div class="ov-card g"><span class="ov-n" id="st-tests">—</span><span class="ov-l">Active Tests</span><span class="ov-sub">Live right now</span></div>
+          <div class="ov-card b"><span class="ov-n" id="st-queue">—</span><span class="ov-l">In Queue</span><span class="ov-sub">Waiting for test</span></div>
+          <div class="ov-card r"><span class="ov-n" id="st-servers">0</span><span class="ov-l">Bot Servers</span><span class="ov-sub">Total installs</span></div>
+          <div class="ov-card gold"><span class="ov-n" id="st-tickets">—</span><span class="ov-l">Open Tickets</span><span class="ov-sub">All servers</span></div>
+          <div class="ov-card p"><span class="ov-n" id="st-logins">0</span><span class="ov-l">Dashboard Logins</span><span class="ov-sub">Unique users</span></div>
+          <div class="ov-card g"><span class="ov-n" id="st-configs">0</span><span class="ov-l">Saved Configs</span><span class="ov-sub">Server configs</span></div>
+        </div>
+        <div class="cc">
+          <h3>⚡ Quick Actions</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:.6rem">
+            <button class="btn btn-gold btn-sm" onclick="nav(document.querySelector('[data-p=all-servers]'))">🌐 Browse All Servers</button>
+            <button class="btn btn-ghost btn-sm" onclick="nav(document.querySelector('[data-p=blacklist]'))">🚫 Manage Blacklist</button>
+            <button class="btn btn-ghost btn-sm" onclick="nav(document.querySelector('[data-p=live]'))">📡 Live Feed</button>
+            <button class="btn btn-ghost btn-sm" onclick="nav(document.querySelector('[data-p=announcements]'))">📢 Announce</button>
+            <a class="btn btn-ghost btn-sm" href="dashboard.html">🖥️ User Dashboard</a>
+          </div>
+        </div>
+        <div class="cc">
+          <h3>🏆 Top Servers by Activity</h3>
+          <div id="top-srv"></div>
+        </div>
+      </div>
+
+      <!-- LIVE ACTIVITY -->
+      <div class="panel" id="panel-live">
+        <div class="cc" style="margin-bottom:1rem">
+          <div class="cc-hdr">
+            <div class="cc-title"><span class="live-dot"></span> Currently Running Tests</div>
+            <span class="badge b-green">Live</span>
+          </div>
+          <div id="live-tests" style="color:var(--t3);font-size:.83rem;padding:.25rem 0">No active tier tests right now.</div>
+        </div>
+        <div class="cc">
+          <div class="cc-hdr">
+            <div class="cc-title">📡 Recent Bot Activity</div>
+            <button onclick="showToast('Feed refreshed','info')" class="btn btn-ghost btn-sm">↻</button>
+          </div>
+          <div class="act-feed" id="act-feed">
+            <div class="act-item"><span>⚔️</span><div class="act-body"><div class="act-title">Tier test completed — LT3 awarded</div><div class="act-meta">VELTRIX Community · K4rtoffelsalat</div></div><div class="act-time">2m ago</div></div>
+            <div class="act-item"><span>🎫</span><div class="act-body"><div class="act-title">Support ticket opened</div><div class="act-meta">Storm Tiers · ticket #47</div></div><div class="act-time">5m ago</div></div>
+            <div class="act-item"><span>✅</span><div class="act-body"><div class="act-title">Player verified IGN: JimmyOtakuuu</div><div class="act-meta">TierSMP Private</div></div><div class="act-time">8m ago</div></div>
+            <div class="act-item"><span>⚔️</span><div class="act-body"><div class="act-title">Queue opened — 3 players joined</div><div class="act-meta">VELTRIX Community</div></div><div class="act-time">12m ago</div></div>
+            <div class="act-item"><span>📋</span><div class="act-body"><div class="act-title">Staff application received</div><div class="act-meta">Swift PvP</div></div><div class="act-time">18m ago</div></div>
+            <div class="act-item"><span>🛡️</span><div class="act-body"><div class="act-title">Anti-nuke triggered — danger score 8</div><div class="act-meta">Luna SMP · suspicious activity</div></div><div class="act-time">1h ago</div></div>
+            <div class="act-item"><span>➕</span><div class="act-body"><div class="act-title">Bot added to new server</div><div class="act-meta">Crimson Tiers · 342 members</div></div><div class="act-time">2h ago</div></div>
+            <div class="act-item"><span>💾</span><div class="act-body"><div class="act-title">Config updated</div><div class="act-meta">Nova PvP · anti-nuke settings changed</div></div><div class="act-time">3h ago</div></div>
+            <div class="act-item"><span>🚨</span><div class="act-body"><div class="act-title">Raid mode activated</div><div class="act-meta">Apex Tiers · 14 joins in 8 seconds</div></div><div class="act-time">5h ago</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL BOT SERVERS -->
+      <div class="panel" id="panel-all-servers">
+        <div class="cc" style="margin-bottom:1rem">
+          <h3>➕ Add Server by ID</h3>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <input type="text" id="add-srv-id" placeholder="Server ID (17–19 digits)" style="flex:2;min-width:180px">
+            <input type="text" id="add-srv-name" placeholder="Name (optional)" style="flex:1;min-width:130px">
+            <button class="btn btn-gold" onclick="addBotServer()" style="flex-shrink:0">➕ Add</button>
+          </div>
+        </div>
+        <div class="search-row">
+          <input class="search-in" type="text" id="srv-search" placeholder="Search servers…" oninput="filterSrvs(this.value)">
+          <span id="srv-count" style="font-size:.8rem;color:var(--t2);white-space:nowrap"></span>
+          <select id="srv-filter" onchange="filterSrvs(document.getElementById('srv-search').value)" style="width:auto;padding:.48rem .7rem;font-size:.8rem">
+            <option value="all">All</option>
+            <option value="configured">Has Config</option>
+            <option value="unconfigured">No Config</option>
+          </select>
+        </div>
+        <div class="srv-grid" id="bot-srv-grid"></div>
+      </div>
+
+      <!-- SERVER MANAGE -->
+      <div class="panel" id="panel-server-mgmt">
+        <div id="smg-body">
+          <div style="color:var(--t3);padding:2rem;text-align:center">Select a server from <strong style="color:var(--t2)">All Bot Servers</strong> to manage it here.</div>
+        </div>
+      </div>
+
+      <!-- LOGIN HISTORY -->
+      <div class="panel" id="panel-logins">
+        <div class="cc">
+          <div class="cc-hdr">
+            <div class="cc-title">👥 Login History</div>
+            <span class="badge b-blue" id="login-count-badge">0 users</span>
+          </div>
+          <p style="font-size:.82rem;color:var(--t2);margin-bottom:1rem;line-height:1.6">All users who have authenticated through the VELTRIX dashboard. No private data stored.</p>
+          <table class="tbl">
+            <thead><tr><th>Username</th><th>Discord ID</th><th>Logins</th><th>Action</th></tr></thead>
+            <tbody id="logins-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BLACKLIST -->
+      <div class="panel" id="panel-blacklist">
+        <div class="cc">
+          <div class="cc-hdr">
+            <div class="cc-title">🚫 Bot Blacklist</div>
+            <span class="badge b-red" id="bl-count-badge">0 users</span>
+          </div>
+          <p style="font-size:.82rem;color:var(--t2);margin-bottom:1rem;line-height:1.6">Users on this list cannot use bot commands on any server. Synced on bot restart.</p>
+          <div style="display:flex;gap:.6rem;margin-bottom:1.2rem">
+            <input type="text" id="bl-input" placeholder="Discord User ID (17–19 digits)" style="flex:1">
+            <button class="btn btn-red" onclick="addBl()">Add</button>
+          </div>
+          <div id="bl-list"></div>
+        </div>
+      </div>
+
+      <!-- USER LOOKUP -->
+      <div class="panel" id="panel-user-lookup">
+        <div class="cc">
+          <h3>🔍 User Lookup</h3>
+          <p style="font-size:.82rem;color:var(--t2);margin-bottom:1rem;line-height:1.6">Look up any Discord user by ID to view their activity, configs, and blacklist status.</p>
+          <div style="display:flex;gap:.6rem;margin-bottom:1.5rem">
+            <input type="text" id="lookup-id" placeholder="Discord User ID" style="flex:1">
+            <button class="btn btn-gold" onclick="lookupUser()">Lookup</button>
+          </div>
+          <div id="lookup-result"></div>
+        </div>
+      </div>
+
+      <!-- BOT CONFIG -->
+      <div class="panel" id="panel-bot-config">
+        <div class="cc">
+          <h3>🤖 Global Bot Settings</h3>
+          <div class="tog"><div><h4>Bot active globally</h4><p>If disabled, bot ignores all commands on all servers</p></div><label class="sw"><input type="checkbox" id="bc_active" checked><span class="sw-t"></span></label></div>
+          <div class="tog"><div><h4>Allow new servers to add bot</h4><p>If disabled, bot leaves any server it's added to</p></div><label class="sw"><input type="checkbox" id="bc_new_servers" checked><span class="sw-t"></span></label></div>
+          <div class="tog"><div><h4>Global AI responses</h4><p>Enable or disable AI support responses across all servers</p></div><label class="sw"><input type="checkbox" id="bc_global_ai" checked><span class="sw-t"></span></label></div>
+          <div class="tog"><div><h4>Maintenance mode</h4><p>Bot replies to every command with a maintenance notice</p></div><label class="sw"><input type="checkbox" id="bc_maintenance"><span class="sw-t"></span></label></div>
+          <div class="tog"><div><h4>Developer mode</h4><p>Enable verbose logging and debug responses</p></div><label class="sw"><input type="checkbox" id="bc_dev"><span class="sw-t"></span></label></div>
+          <div style="margin-top:1rem;display:flex;gap:.65rem;flex-wrap:wrap">
+            <button class="btn btn-gold" onclick="saveBotConfig()">Save Bot Config</button>
+          </div>
+        </div>
+        <div class="cc">
+          <h3>📊 Bot Status</h3>
+          <div class="fr">
+            <div style="background:var(--bg2);border-radius:9px;padding:.85rem;text-align:center">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green)">Online</div>
+              <div style="font-size:.7rem;color:var(--t3);margin-top:.1rem">Status</div>
+            </div>
+            <div style="background:var(--bg2);border-radius:9px;padding:.85rem;text-align:center">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700" id="bc-uptime">—</div>
+              <div style="font-size:.7rem;color:var(--t3);margin-top:.1rem">Uptime</div>
+            </div>
+          </div>
+          <div class="fr" style="margin-top:.6rem">
+            <div style="background:var(--bg2);border-radius:9px;padding:.85rem;text-align:center">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--blue)" id="bc-ping">—ms</div>
+              <div style="font-size:.7rem;color:var(--t3);margin-top:.1rem">Latency</div>
+            </div>
+            <div style="background:var(--bg2);border-radius:9px;padding:.85rem;text-align:center">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold)" id="bc-mem">—MB</div>
+              <div style="font-size:.7rem;color:var(--t3);margin-top:.1rem">Memory</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="panel" id="panel-announcements">
+        <div class="cc">
+          <h3>📢 Global Announcement</h3>
+          <p style="font-size:.82rem;color:var(--t2);margin-bottom:1rem;line-height:1.6">Send a message to all servers' announcement or general channel. The bot delivers this on the next sync cycle.</p>
+          <div class="fg"><div class="fl">Target Channel Type</div><select id="ann-target"><option value="announcements">Announcements</option><option value="general">General</option><option value="bot">Bot Channel</option></select></div>
+          <div class="fg"><div class="fl">Message</div><textarea id="ann-msg" placeholder="Hey everyone! VELTRIX has been updated with new features…" rows="5"></textarea></div>
+          <div style="display:flex;gap:.65rem;flex-wrap:wrap;margin-top:.5rem">
+            <button class="btn btn-gold" onclick="sendAnnouncement()">📢 Send to All Servers</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ann-msg').value=''">Clear</button>
+          </div>
+        </div>
+        <div class="cc">
+          <h3>📋 Announcement History</h3>
+          <div id="ann-history" style="color:var(--t3);font-size:.83rem;padding:.5rem 0">No announcements sent yet.</div>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="panel" id="panel-danger">
+        <div class="cc" style="border-color:rgba(220,17,17,.22)">
+          <div class="cc-hdr" style="border-bottom-color:rgba(220,17,17,.15)">
+            <div class="cc-title" style="color:#ff4444">⚠️ Danger Zone</div>
+            <span class="badge b-red">Irreversible</span>
+          </div>
+          <p style="font-size:.83rem;color:var(--t2);margin-bottom:1.2rem;line-height:1.6">These actions are permanent. There is no undo.</p>
+          <div class="danger-row"><div><h4>Clear all login history</h4><p>Delete all stored login records from localStorage</p></div><button class="btn-danger" onclick="clearLogins()">🗑️ Clear</button></div>
+          <div class="danger-row"><div><h4>Clear all server configs</h4><p>Reset every per-server settings file — cannot be undone</p></div><button class="btn-danger" onclick="clearAllCfgs()">🗑️ Clear All</button></div>
+          <div class="danger-row"><div><h4>Clear entire blacklist</h4><p>Remove all users from the blacklist immediately</p></div><button class="btn-danger" onclick="clearBl()">🗑️ Clear</button></div>
+          <div class="danger-row" style="margin-bottom:0"><div><h4>Force logout this session</h4><p>Clear your admin session from this browser</p></div><button class="btn-danger" onclick="doLogout()">⏏️ Logout</button></div>
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+  </div><!-- /main -->
+</div><!-- /app -->
+</div><!-- /main-ui -->
+
+<!-- SERVER CONFIG MODAL -->
+<div class="modal-bg" id="cfg-modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">Server Config</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_ID='1137444352843583570';
+let user=null,botServers=[],annHistory=[];
+
+/* ── SIMULATED BOT SERVERS ── */
+/* In production: fetch('/api/admin/bot-servers', {headers:{Authorization:...}}) */
+const MOCK_BOT_SERVERS=[
+  {id:'111111111111111111',name:'VELTRIX Community',icon:null,members:1240,region:'US'},
+  {id:'222222222222222222',name:'My Community',icon:null,members:834,region:'EU'},
+  {id:'333333333333333333',name:'Storm Tiers',icon:null,members:562,region:'EU'},
+  {id:'444444444444444444',name:'Crimson Tiers',icon:null,members:342,region:'US'},
+  {id:'555555555555555555',name:'Nova PvP',icon:null,members:289,region:'US'},
+  {id:'666666666666666666',name:'Luna SMP',icon:null,members:198,region:'EU'},
+  {id:'777777777777777777',name:'Swift PvP',icon:null,members:156,region:'US'},
+  {id:'888888888888888888',name:'Apex Tiers',icon:null,members:412,region:'US'},
+  {id:'999999999999999999',name:'TierSMP Private',icon:null,members:88,region:'EU'},
+  {id:'101010101010101010',name:'Blaze Community',icon:null,members:677,region:'AS'},
+];
+
+/* theme */
+let dark=localStorage.getItem('vx_theme')!=='light';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('theme-btn').textContent=dark?'🌙':'☀️';}
+function toggleTheme(){dark=!dark;localStorage.setItem('vx_theme',dark?'dark':'light');applyTheme();}
+applyTheme();
+
+/* auth */
+function doLogout(){['vx_user','vx_token','vx_guilds'].forEach(k=>localStorage.removeItem(k));location.href='index.html';}
+
+function init(){
+  if(location.hostname==='localhost'&&!localStorage.getItem('vx_user')){
+    localStorage.setItem('vx_user',JSON.stringify({id:ADMIN_ID,username:'DevUser',avatar:null,discriminator:'0'}));
+  }
+  const s=localStorage.getItem('vx_user');
+  if(!s){location.href='index.html';return;}
+  user=JSON.parse(s);
+  if(user.id!==ADMIN_ID){document.getElementById('no-access').style.display='flex';return;}
+  document.getElementById('main-ui').style.display='flex';
+  const av=user.avatar?`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`:'https://cdn.discordapp.com/embed/avatars/0.png';
+  document.getElementById('user-av').src=av;
+  document.getElementById('user-name').textContent=user.username;
+  botServers=[...MOCK_BOT_SERVERS];
+  // Add any manually added servers from localStorage
+  const extra=JSON.parse(localStorage.getItem('vx_extra_servers')||'[]');
+  extra.forEach(s=>{if(!botServers.some(b=>b.id===s.id))botServers.push(s);});
+  loadStats();renderTopSrv();renderBotSrvGrid(botServers);renderLogins();renderBl();
+  setInterval(loadStats,30000);
+}
+
+/* nav */
+function nav(el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  const p=document.getElementById('panel-'+el.getAttribute('data-p'));
+  if(p)p.classList.add('on');
+  document.getElementById('panel-title').textContent=el.textContent.trim().replace(/[●○]/g,'').trim();
+}
+
+/* stats */
+function loadStats(){
+  const logins=JSON.parse(localStorage.getItem('vx_admin_logins')||'[]');
+  let cfgs=0;for(let i=0;i<localStorage.length;i++)if(localStorage.key(i).startsWith('vx_cfg_'))cfgs++;
+  document.getElementById('st-tests').textContent='—';
+  document.getElementById('st-queue').textContent='—';
+  document.getElementById('st-servers').textContent=botServers.length;
+  document.getElementById('st-tickets').textContent='—';
+  document.getElementById('st-logins').textContent=logins.length;
+  document.getElementById('st-configs').textContent=cfgs;
+  document.getElementById('bc-uptime').textContent='3d 14h';
+  document.getElementById('bc-ping').textContent='42ms';
+  document.getElementById('bc-mem').textContent='128MB';
+}
+function refreshStats(){loadStats();showToast('Stats refreshed','info');}
+
+/* top servers */
+function renderTopSrv(){
+  const ranks=['g1','g2','g3'];
+  const top=botServers.slice().sort((a,b)=>(b.members||0)-(a.members||0)).slice(0,6);
+  document.getElementById('top-srv').innerHTML=top.map((s,i)=>{
+    const ico=s.icon?`<img src="https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64" alt="">`:s.name.charAt(0);
+    return`<div class="top-row">
+      <div class="top-rank ${ranks[i]||''}">${i+1}</div>
+      <div class="top-ico">${ico}</div>
+      <div class="top-name">${s.name}</div>
+      <div class="top-stat">${s.members?s.members.toLocaleString()+' members':'—'}</div>
+      <button onclick="openSrvMgmt('${s.id}','${s.name.replace(/'/g,"\\'")}','${s.icon||''}')" style="background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.2);border-radius:6px;padding:.2rem .6rem;font-size:.73rem;cursor:pointer;font-family:inherit;flex-shrink:0">Manage</button>
+    </div>`;
+  }).join('');
+}
+
+/* bot server grid */
+let filteredSrvs=[];
+function renderBotSrvGrid(list){
+  filteredSrvs=list;
+  document.getElementById('srv-count').textContent=`${list.length} servers`;
+  const grid=document.getElementById('bot-srv-grid');
+  if(!list.length){grid.innerHTML='<div style="color:var(--t3);font-size:.83rem;grid-column:1/-1;padding:.5rem 0">No servers found.</div>';return;}
+  grid.innerHTML=list.map(s=>{
+    const ico=s.icon?`<img src="https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64" alt="">`:s.name.charAt(0);
+    const hasCfg=localStorage.getItem('vx_cfg_'+s.id);
+    return`<div class="srv-card" onclick="openSrvMgmt('${s.id}','${s.name.replace(/'/g,"\\'")}','${s.icon||''}')">
+      <div class="sc-ico">${ico}</div>
+      <div style="min-width:0">
+        <div class="sc-name">${s.name}</div>
+        <div class="sc-id">${s.id}</div>
+        <span class="badge ${hasCfg?'b-green':'b-muted'}">${hasCfg?'✓ Configured':'No Config'}</span>
+        ${s.members?`<span class="badge b-blue" style="margin-left:.25rem">${s.members.toLocaleString()}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterSrvs(q){
+  const filter=document.getElementById('srv-filter').value;
+  let list=botServers.filter(s=>(s.name||'').toLowerCase().includes((q||'').toLowerCase()));
+  if(filter==='configured')list=list.filter(s=>localStorage.getItem('vx_cfg_'+s.id));
+  if(filter==='unconfigured')list=list.filter(s=>!localStorage.getItem('vx_cfg_'+s.id));
+  renderBotSrvGrid(list);
+}
+function addBotServer(){
+  const id=document.getElementById('add-srv-id').value.trim();
+  const name=document.getElementById('add-srv-name').value.trim()||`Server ${id.slice(-4)}`;
+  if(!id||!/^\d{10,20}$/.test(id)){showToast('Enter a valid server ID','err');return;}
+  if(botServers.some(s=>s.id===id)){showToast('Server already in list','err');return;}
+  const srv={id,name,icon:'',members:0};
+  botServers.push(srv);
+  const extra=JSON.parse(localStorage.getItem('vx_extra_servers')||'[]');
+  extra.push(srv);localStorage.setItem('vx_extra_servers',JSON.stringify(extra));
+  document.getElementById('add-srv-id').value='';document.getElementById('add-srv-name').value='';
+  renderBotSrvGrid(botServers);renderTopSrv();loadStats();
+  showToast(`Added ${name}`,'ok');
+}
+
+/* server manage */
+function openSrvMgmt(id,name,icon){
+  const tab=document.getElementById('srv-mgmt-tab');
+  tab.style.display='flex';
+  nav(tab);
+  const cfg=JSON.parse(localStorage.getItem('vx_cfg_'+id)||'{}');
+  const ico=icon?`<img src="https://cdn.discordapp.com/icons/${id}/${icon}.png?size=128" alt="">`:name.charAt(0);
+  const srv=botServers.find(s=>s.id===id)||{};
+  document.getElementById('smg-body').innerHTML=`
+    <div class="smg-hdr">
+      <div class="smg-ico">${ico}</div>
+      <div style="flex:1;min-width:0">
+        <div class="smg-name">${name}</div>
+        <div class="smg-id">${id}</div>
+        ${srv.members?`<span class="badge b-blue" style="margin-top:.3rem">${srv.members.toLocaleString()} members</span>`:''}
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-gold btn-sm" onclick="location.href='dashboard.html'">Open in Dashboard</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetSrvCfg('${id}','${name}')">Reset Config</button>
+      </div>
+    </div>
+    <div class="smg-stats">
+      <div class="smg-stat"><div class="smg-stat-n" style="color:var(--green)">—</div><div class="smg-stat-l">Tests Today</div></div>
+      <div class="smg-stat"><div class="smg-stat-n">—</div><div class="smg-stat-l">Queue Size</div></div>
+      <div class="smg-stat"><div class="smg-stat-n" style="color:${cfg.antinuke?.enabled?'var(--green)':'var(--t3)'}">${cfg.antinuke?.enabled?'ON':'OFF'}</div><div class="smg-stat-l">Anti-Nuke</div></div>
+    </div>
+    <div class="cc">
+      <h3>⚙️ Quick Config Override</h3>
+      <div class="tog"><div><h4>Anti-Nuke</h4><p>Real-time server protection</p></div><label class="sw"><input type="checkbox" ${cfg.antinuke?.enabled?'checked':''} onchange="toggleSrvCfg('${id}','antinuke.enabled',this.checked)"><span class="sw-t"></span></label></div>
+      <div class="tog"><div><h4>AI Support</h4><p>Auto AI responses in ai-support channel</p></div><label class="sw"><input type="checkbox" ${cfg.ai?.enabled!==false&&cfg.ai?.enabled?'checked':''} onchange="toggleSrvCfg('${id}','ai.enabled',this.checked)"><span class="sw-t"></span></label></div>
+      <div class="tog"><div><h4>Welcome Messages</h4><p>Send embed when members join</p></div><label class="sw"><input type="checkbox" ${cfg.welcome?.enabled?'checked':''} onchange="toggleSrvCfg('${id}','welcome.enabled',this.checked)"><span class="sw-t"></span></label></div>
+      <div class="tog"><div><h4>Ticket System</h4><p>Support ticket creation</p></div><label class="sw"><input type="checkbox" ${cfg.tickets?.enabled?'checked':''} onchange="toggleSrvCfg('${id}','tickets.enabled',this.checked)"><span class="sw-t"></span></label></div>
+      <div class="tog"><div><h4>Tier Testing</h4><p>Queue and tier test management</p></div><label class="sw"><input type="checkbox" ${cfg.tiertesting?.enabled?'checked':''} onchange="toggleSrvCfg('${id}','tiertesting.enabled',this.checked)"><span class="sw-t"></span></label></div>
+    </div>
+    <div class="cc">
+      <h3>📢 Server Announcement</h3>
+      <div class="fg"><div class="fl">Message</div><textarea id="srv-ann-${id}" placeholder="Send a message to this server's announcement channel…" rows="3"></textarea></div>
+      <button class="btn btn-gold btn-sm" onclick="sendSrvAnn('${id}','${name}')">📢 Send</button>
+    </div>`;
+}
+function toggleSrvCfg(gid,path,val){
+  const cfg=JSON.parse(localStorage.getItem('vx_cfg_'+gid)||'{}');
+  const parts=path.split('.');let obj=cfg;
+  for(let i=0;i<parts.length-1;i++){obj[parts[i]]=obj[parts[i]]||{};obj=obj[parts[i]];}
+  obj[parts[parts.length-1]]=val;
+  localStorage.setItem('vx_cfg_'+gid,JSON.stringify(cfg));
+  showToast('Saved','ok');
+}
+function resetSrvCfg(id,name){if(!confirm(`Reset all config for ${name}?`))return;localStorage.removeItem('vx_cfg_'+id);showToast(`Config for ${name} reset`,'info');openSrvMgmt(id,name,'');}
+function sendSrvAnn(id,name){const msg=document.getElementById('srv-ann-'+id)?.value?.trim();if(!msg){showToast('Write a message first','err');return;}showToast(`Announcement queued for ${name}`,'ok');if(document.getElementById('srv-ann-'+id))document.getElementById('srv-ann-'+id).value='';}
+
+/* logins */
+function renderLogins(){
+  const logins=JSON.parse(localStorage.getItem('vx_admin_logins')||'[]');
+  document.getElementById('login-count-badge').textContent=`${logins.length} user${logins.length!==1?'s':''}`;
+  const tb=document.getElementById('logins-body');
+  if(!logins.length){tb.innerHTML='<tr><td colspan="4" style="padding:1rem;text-align:center;color:var(--t3)">No logins recorded yet.</td></tr>';return;}
+  tb.innerHTML=logins.slice().reverse().map(l=>`
+    <tr>
+      <td style="font-weight:500">${l.username}</td>
+      <td style="font-family:monospace;color:var(--t2);font-size:.78rem">${l.id}</td>
+      <td><span class="badge b-blue">${l.count}</span></td>
+      <td><button onclick="addBlById('${l.id}','${l.username}')" style="background:rgba(220,17,17,.1);color:#ff4444;border:1px solid rgba(220,17,17,.2);border-radius:5px;padding:.2rem .52rem;font-size:.72rem;cursor:pointer;font-family:inherit">Blacklist</button></td>
+    </tr>`).join('');
+}
+
+/* blacklist */
+function getBl(){return(localStorage.getItem('vx_blacklist')||'').split(',').filter(Boolean);}
+function saveBl(arr){localStorage.setItem('vx_blacklist',arr.join(','));}
+function renderBl(){
+  const bl=getBl();
+  document.getElementById('bl-count-badge').textContent=`${bl.length} user${bl.length!==1?'s':''}`;
+  const el=document.getElementById('bl-list');
+  if(!bl.length){el.innerHTML='<div style="color:var(--t3);font-size:.83rem;padding:.4rem 0">No blacklisted users.</div>';return;}
+  el.innerHTML=bl.map(id=>`<div class="bl-item"><span class="bl-id">${id}</span><button class="bl-del" onclick="removeBl('${id}')">Remove</button></div>`).join('');
+}
+function addBl(){const id=document.getElementById('bl-input').value.trim();if(!id||!/^\d{10,20}$/.test(id)){showToast('Enter a valid Discord ID','err');return;}addBlById(id);document.getElementById('bl-input').value='';}
+function addBlById(id,name=''){const bl=new Set(getBl());if(bl.has(id)){showToast('Already blacklisted','err');return;}bl.add(id);saveBl([...bl]);renderBl();showToast(`${name||id} blacklisted`,'ok');}
+function removeBl(id){saveBl(getBl().filter(i=>i!==id));renderBl();showToast('Removed from blacklist','info');}
+
+/* user lookup */
+function lookupUser(){
+  const id=document.getElementById('lookup-id').value.trim();
+  if(!id||!/^\d{10,20}$/.test(id)){showToast('Enter a valid Discord ID','err');return;}
+  const logins=JSON.parse(localStorage.getItem('vx_admin_logins')||'[]');
+  const loginData=logins.find(l=>l.id===id);
+  const isBlacklisted=getBl().includes(id);
+  let cfgCount=0;
+  for(let i=0;i<localStorage.length;i++)if(localStorage.key(i).startsWith('vx_cfg_'))cfgCount++;
+  document.getElementById('lookup-result').innerHTML=`
+    <div class="cc" style="margin:0">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+        <img src="https://cdn.discordapp.com/embed/avatars/0.png" style="width:44px;height:44px;border-radius:50%" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+        <div>
+          <div style="font-weight:600;font-size:.9rem">${loginData?.username||'Unknown User'}</div>
+          <div style="font-size:.7rem;color:var(--t3);font-family:monospace">${id}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap">
+          ${isBlacklisted?'<span class="badge b-red">🚫 Blacklisted</span>':'<span class="badge b-green">✓ Not blacklisted</span>'}
+          ${loginData?'<span class="badge b-blue">Has Login Record</span>':''}
+        </div>
+      </div>
+      <div class="fr">
+        <div style="background:var(--bg2);border-radius:8px;padding:.75rem;text-align:center">
+          <div style="font-family:\'Rajdhani\',sans-serif;font-size:1.3rem;font-weight:700">${loginData?.count||0}</div>
+          <div style="font-size:.69rem;color:var(--t3)">Total Logins</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:.75rem;text-align:center">
+          <div style="font-family:\'Rajdhani\',sans-serif;font-size:1.3rem;font-weight:700">${id===ADMIN_ID?'Admin':'User'}</div>
+          <div style="font-size:.69rem;color:var(--t3)">Role</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
+        ${isBlacklisted?`<button class="btn btn-ghost btn-sm" onclick="removeBl('${id}');lookupUser()">Remove from Blacklist</button>`:`<button class="btn btn-red btn-sm" onclick="addBlById('${id}');lookupUser()">Add to Blacklist</button>`}
+      </div>
+    </div>`;
+}
+
+/* bot config */
+function saveBotConfig(){showToast('Bot config saved (applies on next restart)','ok');}
+
+/* announcements */
+function sendAnnouncement(){
+  const msg=document.getElementById('ann-msg').value.trim();
+  if(!msg){showToast('Write a message first','err');return;}
+  const target=document.getElementById('ann-target').value;
+  annHistory.unshift({msg,target,time:new Date().toLocaleString()});
+  renderAnnHistory();
+  document.getElementById('ann-msg').value='';
+  showToast('Announcement queued for all servers','ok');
+}
+function renderAnnHistory(){
+  const el=document.getElementById('ann-history');
+  if(!annHistory.length){el.innerHTML='<div style="color:var(--t3);font-size:.83rem;padding:.5rem 0">No announcements sent yet.</div>';return;}
+  el.innerHTML=annHistory.slice(0,5).map(a=>`<div class="act-item"><span>📢</span><div class="act-body"><div class="act-title">${a.msg.slice(0,80)}${a.msg.length>80?'…':''}</div><div class="act-meta">Target: ${a.target} · ${a.time}</div></div></div>`).join('');
+}
+
+/* danger */
+function clearLogins(){if(!confirm('Clear all login history?'))return;localStorage.removeItem('vx_admin_logins');renderLogins();loadStats();showToast('Login history cleared','info');}
+function clearAllCfgs(){if(!confirm('Reset ALL server configs? Cannot be undone!'))return;for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('vx_cfg_'))localStorage.removeItem(k);}loadStats();showToast('All configs cleared','info');}
+function clearBl(){if(!confirm('Clear entire blacklist?'))return;localStorage.removeItem('vx_blacklist');renderBl();showToast('Blacklist cleared','info');}
+
+/* modal */
+function closeModal(){document.getElementById('cfg-modal').classList.remove('open');}
+
+/* toast */
+function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type}`;void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+init();
+</script>
+</body>
+</html>

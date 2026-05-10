@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — VELTRIX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090f;--bg2:#0d0d1a;--bg3:#111120;
+  --s1:#0f0f1e;--s2:#161628;--s3:#1c1c32;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--b3:rgba(255,255,255,.04);
+  --t1:#e8e8f8;--t2:#9898c0;--t3:#5a5a80;
+  --red:#d42060;--red2:#ff3575;--green:#1ecc6e;--blue:#4a90f0;--gold:#f5c518;--purple:#9966ff;
+}
+[data-theme=light]{
+  --bg:#f0f0f8;--bg2:#e6e6f2;--bg3:#dcdce8;
+  --s1:#fff;--s2:#f5f5fc;--s3:#ededf8;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);--b3:rgba(0,0,0,.04);
+  --t1:#0d0d1a;--t2:#555580;--t3:#9090b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);display:flex;flex-direction:column;}
+a{text-decoration:none;color:inherit;}
+
+/* topbar */
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;z-index:100;}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.28rem;font-weight:700;letter-spacing:.1em;cursor:pointer;}
+.logo em{color:var(--red);font-style:normal;}
+.tb-right{display:flex;align-items:center;gap:.5rem;}
+.chip{display:flex;align-items:center;gap:.38rem;background:var(--s2);border:1px solid var(--b1);padding:.18rem .65rem .18rem .28rem;border-radius:20px;font-size:.8rem;font-weight:500;}
+.chip img{width:22px;height:22px;border-radius:50%;object-fit:cover;}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .85rem;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:all .18s;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:var(--red2);box-shadow:0 4px 14px rgba(212,32,96,.3);}
+.btn-ghost{background:transparent;border:1px solid var(--b1);color:var(--t2);}.btn-ghost:hover{border-color:var(--red);color:var(--red);}
+.btn-sm{padding:.3rem .7rem;font-size:.75rem;}
+.icon-btn{background:none;border:1px solid var(--b1);border-radius:7px;padding:.28rem .48rem;font-size:.9rem;cursor:pointer;color:var(--t2);line-height:1;transition:all .18s;}
+.icon-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* layout */
+.app{flex:1;display:flex;overflow:hidden;}
+
+/* sidebar */
+.sidebar{width:232px;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;transition:width .22s;overflow:hidden;}
+.sidebar.off{width:0;}
+.sb-server{padding:.85rem 1rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.65rem;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.sb-server:hover{background:var(--s2);}
+.sb-ico{width:36px;height:36px;border-radius:9px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;overflow:hidden;}
+.sb-ico img{width:36px;height:36px;border-radius:9px;object-fit:cover;}
+.sb-srv-name{font-weight:600;font-size:.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.sb-srv-sub{font-size:.69rem;color:var(--t3);margin-top:.08rem;}
+.sb-nav{flex:1;overflow-y:auto;padding:.4rem 0;}
+.sb-nav::-webkit-scrollbar{width:3px;}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+.sb-sec{font-size:.59rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:.55rem 1rem .18rem;}
+.sb-item{display:flex;align-items:center;gap:.55rem;padding:.42rem 1rem;font-size:.81rem;font-weight:500;color:var(--t2);cursor:pointer;transition:all .14s;border-left:2px solid transparent;user-select:none;white-space:nowrap;}
+.sb-item:hover{background:var(--b3);color:var(--t1);}
+.sb-item.on{background:rgba(212,32,96,.09);color:var(--red2);border-left-color:var(--red);font-weight:600;}
+.si{font-size:.86rem;width:17px;text-align:center;flex-shrink:0;}
+.mod-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.mod-dot.active{background:var(--green);}
+.mod-dot.inactive{background:var(--t3);}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* server select */
+#pg-select{flex:1;overflow-y:auto;padding:1.75rem;}
+#pg-select::-webkit-scrollbar{width:4px;}
+#pg-select::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+.sel-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.75rem;gap:1rem;flex-wrap:wrap;}
+.sel-hdr h2{font-family:'Rajdhani',sans-serif;font-size:1.55rem;font-weight:700;}
+.sel-hdr p{font-size:.83rem;color:var(--t2);margin-top:.2rem;}
+.sel-search{background:var(--s1);border:1px solid var(--b1);border-radius:9px;padding:.52rem 1rem;color:var(--t1);font-size:.84rem;font-family:inherit;outline:none;transition:border-color .18s;width:210px;}
+.sel-search:focus{border-color:var(--red);}
+.sel-search::placeholder{color:var(--t3);}
+.sec-title{font-size:.67rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--b1);}
+.srv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.7rem;margin-bottom:1.75rem;}
+.srv-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s;}
+.srv-card:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,32,96,.1);}
+.srv-card.no-click{cursor:default;opacity:.55;}
+.srv-card.no-click:hover{border-color:var(--b1);transform:none;box-shadow:none;}
+.sc-ico{width:44px;height:44px;border-radius:11px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;overflow:hidden;}
+.sc-ico img{width:44px;height:44px;border-radius:11px;object-fit:cover;}
+.sc-name{font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sc-id{font-size:.69rem;color:var(--t3);margin-top:.1rem;font-family:monospace;}
+.badge{display:inline-flex;align-items:center;gap:.22rem;padding:.1rem .45rem;border-radius:10px;font-size:.7rem;font-weight:600;margin-top:.32rem;}
+.b-admin{background:rgba(212,32,96,.1);color:var(--red2);border:1px solid rgba(212,32,96,.18);}
+.b-view{background:var(--b3);color:var(--t2);border:1px solid var(--b1);}
+.b-green{background:rgba(30,204,110,.1);color:var(--green);border:1px solid rgba(30,204,110,.18);}
+.b-blue{background:rgba(74,144,240,.1);color:#7ab4ff;border:1px solid rgba(74,144,240,.18);}
+.b-gold{background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.18);}
+
+/* server config page */
+#pg-server{flex:1;display:none;flex-direction:column;overflow:hidden;}
+#pg-server.show{display:flex;}
+.main-bar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:var(--bg);border-bottom:1px solid var(--b1);flex-shrink:0;}
+.main-title{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;display:flex;align-items:center;gap:.45rem;}
+.save-bar{display:none;align-items:center;gap:.75rem;padding:.55rem 1.5rem;background:rgba(245,197,24,.07);border-bottom:1px solid rgba(245,197,24,.18);flex-shrink:0;}
+.save-bar.show{display:flex;}
+.save-bar p{font-size:.81rem;color:var(--gold);flex:1;}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px;}
+
+/* panels */
+.panel{display:none;padding:1.5rem;}
+.panel.on{display:block;}
+
+/* overview stats */
+.ov-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.65rem;margin-bottom:1rem;}
+.ov-card{border-radius:11px;padding:.9rem 1rem;border:1px solid transparent;position:relative;overflow:hidden;}
+.ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;}
+.ov-card.g{background:rgba(30,204,110,.07);border-color:rgba(30,204,110,.17);}.ov-card.g::before,.ov-card.g .ov-n{background:var(--green);color:var(--green);}
+.ov-card.b{background:rgba(74,144,240,.07);border-color:rgba(74,144,240,.17);}.ov-card.b::before{background:var(--blue);}.ov-card.b .ov-n{color:var(--blue);}
+.ov-card.r{background:rgba(212,32,96,.07);border-color:rgba(212,32,96,.17);}.ov-card.r::before{background:var(--red);}.ov-card.r .ov-n{color:var(--red2);}
+.ov-card.gold{background:rgba(245,197,24,.06);border-color:rgba(245,197,24,.15);}.ov-card.gold::before{background:var(--gold);}.ov-card.gold .ov-n{color:var(--gold);}
+.ov-n{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;line-height:1;display:block;background:transparent!important;}
+.ov-l{font-size:.71rem;color:var(--t2);margin-top:.2rem;display:block;}
+
+/* config cards */
+.cc{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:1.3rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.cc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);opacity:0;transition:opacity .3s;}
+.cc:hover::after{opacity:.5;}
+.cc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--b1);}
+.cc-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:.45rem;}
+.cc-desc{font-size:.77rem;color:var(--t2);margin-top:.18rem;line-height:1.5;}
+.cc h3{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.05em;margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.45rem;}
+
+/* forms */
+.fg{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.8rem;}
+.fl{font-size:.69rem;font-weight:700;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;padding:.48rem .78rem;color:var(--t1);font-size:.845rem;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;}
+input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(212,32,96,.09);}
+input::placeholder,textarea::placeholder{color:var(--t3);}
+textarea{resize:vertical;min-height:78px;line-height:1.55;}
+select option{background:var(--bg2);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+.fr.f3{grid-template-columns:1fr 1fr 1fr;}
+.fr.f1{grid-template-columns:1fr;}
+.ch::before{content:'#';color:var(--t2);font-weight:600;margin-right:.15rem;}
+.ch{display:flex;align-items:center;gap:.2rem;}
+
+/* toggles */
+.tog{display:flex;align-items:center;justify-content:space-between;padding:.68rem .4rem;border-bottom:1px solid var(--b1);border-radius:6px;gap:.75rem;transition:background .14s;}
+.tog:last-child{border-bottom:none;}
+.tog:hover{background:rgba(255,255,255,.025);}
+.tog h4{font-size:.845rem;font-weight:500;}
+.tog p{font-size:.74rem;color:var(--t2);margin-top:.1rem;line-height:1.5;}
+.sw{position:relative;width:40px;height:22px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw-t{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:22px;cursor:pointer;transition:.25s;}
+.sw-t::before{content:'';position:absolute;left:3px;bottom:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+input:checked+.sw-t{background:var(--red);}
+input:checked+.sw-t::before{transform:translateX(18px);}
+
+/* tags */
+.chip-list{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.3rem;}
+.tag{display:inline-flex;align-items:center;gap:.28rem;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:.18rem .52rem;font-size:.77rem;}
+.tag-x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.78rem;padding:0;line-height:1;transition:color .14s;}
+.tag-x:hover{color:var(--red2);}
+.var-tag{background:rgba(212,32,96,.1);border:1px solid rgba(212,32,96,.2);color:#ff799e;padding:.13rem .48rem;border-radius:5px;font-size:.73rem;font-family:monospace;cursor:pointer;transition:background .14s;display:inline-flex;}
+.var-tag:hover{background:rgba(212,32,96,.22);}
+
+/* role row */
+.role-row{display:flex;align-items:center;gap:.55rem;padding:.55rem .7rem;background:var(--bg2);border-radius:8px;margin-bottom:.38rem;border:1px solid var(--b1);}
+.role-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.role-name{font-size:.83rem;font-weight:500;width:55px;flex-shrink:0;}
+
+/* automod grid */
+.amod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:.65rem;}
+.amod-card{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:.85rem;display:flex;flex-direction:column;gap:.42rem;transition:border-color .18s;}
+.amod-card:hover{border-color:rgba(212,32,96,.22);}
+.amod-top{display:flex;align-items:center;gap:.48rem;}
+.amod-name{font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.06em;flex:1;}
+.amod-sub{font-size:.7rem;color:var(--t2);}
+.amod-in{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:.28rem .52rem;color:var(--t1);font-size:.78rem;font-family:inherit;outline:none;resize:none;transition:border-color .18s;}
+.amod-in:focus{border-color:var(--red);}
+
+/* cmds */
+.cmds{display:flex;flex-wrap:wrap;gap:.38rem;}
+.cmd{background:var(--bg2);border:1px solid var(--b1);border-radius:6px;padding:.28rem .68rem;font-family:monospace;font-size:.79rem;color:#ff799e;cursor:default;}
+
+/* toast */
+.toast{position:fixed;bottom:1.75rem;right:1.75rem;padding:.58rem 1.1rem;border-radius:9px;font-size:.82rem;font-weight:600;transform:translateY(120px);opacity:0;transition:.3s;z-index:9999;display:flex;align-items:center;gap:.45rem;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);color:#071a0e;}
+.toast.err{background:#dd2222;color:#fff;}
+.toast.info{background:var(--blue);color:#fff;}
+
+/* danger */
+.danger-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid rgba(220,17,17,.12);border-radius:10px;padding:.85rem 1rem;margin-bottom:.52rem;transition:border-color .18s;}
+.danger-row:hover{border-color:rgba(220,17,17,.28);}
+.danger-row h4{font-size:.87rem;font-weight:600;}
+.danger-row p{font-size:.75rem;color:var(--t2);margin-top:.07rem;}
+.btn-danger{background:rgba(220,17,17,.1);color:#ff4444;border:1px solid rgba(220,17,17,.25);border-radius:7px;padding:.33rem .75rem;font-size:.77rem;font-weight:600;cursor:pointer;font-family:inherit;margin-left:1rem;flex-shrink:0;transition:background .16s;}
+.btn-danger:hover{background:rgba(220,17,17,.2);}
+
+@media(max-width:768px){
+  .sidebar{position:fixed;top:56px;bottom:0;left:-232px;z-index:300;transition:left .22s;}
+  .sidebar.mob-open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.4);}
+  .panel{padding:1rem;}
+  .fr{grid-template-columns:1fr!important;}
+  .ov-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:.7rem">
+    <div class="logo" onclick="goSelect()">⚔ VELTR<em>IX</em></div>
+  </div>
+  <div class="tb-right">
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <div class="chip"><img id="user-av" src="" alt=""><span id="user-name">…</span></div>
+    <button class="btn btn-ghost btn-sm" id="admin-link" onclick="location.href='admin.html'" style="display:none">👑 Admin</button>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar off" id="sidebar">
+    <div class="sb-server" onclick="goSelect()">
+      <div class="sb-ico" id="sb-ico">?</div>
+      <div style="min-width:0;flex:1">
+        <div class="sb-srv-name" id="sb-name">Select server</div>
+        <div class="sb-srv-sub">Click to change</div>
+      </div>
+      <span style="font-size:.72rem;color:var(--t3)">⌄</span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">General</div>
+      <div class="sb-item on" data-p="overview" onclick="nav(this)"><span class="si">📊</span> Overview</div>
+      <div class="sb-item" data-p="commands" onclick="nav(this)"><span class="si">⌨️</span> Commands</div>
+      <div class="sb-sec">Protection</div>
+      <div class="sb-item" data-p="antinuke" onclick="nav(this)"><span class="si">🛡️</span> Anti-Nuke <span class="mod-dot inactive" id="dot-antinuke"></span></div>
+      <div class="sb-item" data-p="automod" onclick="nav(this)"><span class="si">🔨</span> Auto-Mod <span class="mod-dot inactive" id="dot-automod"></span></div>
+      <div class="sb-item" data-p="antiraid" onclick="nav(this)"><span class="si">🚨</span> Anti-Raid <span class="mod-dot inactive" id="dot-antiraid"></span></div>
+      <div class="sb-sec">Features</div>
+      <div class="sb-item" data-p="tiertesting" onclick="nav(this)"><span class="si">⚔️</span> Tier Testing <span class="mod-dot inactive" id="dot-tiertesting"></span></div>
+      <div class="sb-item" data-p="ignverify" onclick="nav(this)"><span class="si">✅</span> IGN Verify <span class="mod-dot inactive" id="dot-ignverify"></span></div>
+      <div class="sb-item" data-p="welcome" onclick="nav(this)"><span class="si">👋</span> Welcome &amp; Leave <span class="mod-dot inactive" id="dot-welcome"></span></div>
+      <div class="sb-item" data-p="tickets" onclick="nav(this)"><span class="si">🎫</span> Tickets <span class="mod-dot inactive" id="dot-tickets"></span></div>
+      <div class="sb-item" data-p="applications" onclick="nav(this)"><span class="si">📋</span> Applications <span class="mod-dot inactive" id="dot-applications"></span></div>
+      <div class="sb-item" data-p="ai" onclick="nav(this)"><span class="si">🤖</span> AI Support <span class="mod-dot inactive" id="dot-ai"></span></div>
+      <div class="sb-sec">System</div>
+      <div class="sb-item" data-p="logging" onclick="nav(this)"><span class="si">📜</span> Logging <span class="mod-dot inactive" id="dot-logging"></span></div>
+      <div class="sb-item" data-p="settings" onclick="nav(this)"><span class="si">⚙️</span> Server Settings</div>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SERVER SELECT -->
+    <div id="pg-select" style="display:none">
+      <div class="sel-hdr">
+        <div><h2>Select a Server</h2><p>Choose a server you manage to configure VELTRIX</p></div>
+        <input class="sel-search" type="text" placeholder="Search servers…" oninput="filterSrv(this.value)" id="srv-search">
+      </div>
+      <div id="sec-admin" style="display:none">
+        <div class="sec-title">Your Servers</div>
+        <div class="srv-grid" id="grid-admin"></div>
+      </div>
+      <div id="sec-view" style="display:none">
+        <div class="sec-title">Can't Manage</div>
+        <div class="srv-grid" id="grid-view"></div>
+      </div>
+    </div>
+
+    <!-- SERVER CONFIG -->
+    <div id="pg-server">
+      <div class="main-bar">
+        <div class="main-title" id="panel-title">📊 Overview</div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <span id="guild-id-display" style="font-size:.7rem;color:var(--t3);font-family:monospace"></span>
+        </div>
+      </div>
+      <div class="save-bar" id="save-bar">
+        <p>⚠️ Unsaved changes</p>
+        <button class="btn btn-ghost btn-sm" onclick="discardChanges()">Discard</button>
+        <button class="btn btn-red btn-sm" onclick="saveConfig()">Save Changes</button>
+      </div>
+      <div class="scroll">
+
+        <!-- OVERVIEW -->
+        <div class="panel on" id="panel-overview">
+          <div class="ov-row">
+            <div class="ov-card g"><span class="ov-n" id="ov-tests">—</span><span class="ov-l">Active Tests</span></div>
+            <div class="ov-card b"><span class="ov-n" id="ov-queue">—</span><span class="ov-l">In Queue</span></div>
+            <div class="ov-card r"><span class="ov-n" id="ov-tickets">—</span><span class="ov-l">Open Tickets</span></div>
+            <div class="ov-card gold"><span class="ov-n" id="ov-members">—</span><span class="ov-l">Members</span></div>
+          </div>
+          <div class="cc">
+            <h3>✅ Active Modules</h3>
+            <div id="ov-mods" style="display:flex;flex-wrap:wrap;gap:.45rem"><span style="color:var(--t3);font-size:.82rem">No modules enabled</span></div>
+          </div>
+          <div class="cc">
+            <h3>⌨️ Bot Commands</h3>
+            <div class="cmds">
+              <span class="cmd">/tier</span><span class="cmd">/verify</span><span class="cmd">/ticket</span>
+              <span class="cmd">/apply</span><span class="cmd">/queue</span><span class="cmd">/warn</span>
+              <span class="cmd">/ban</span><span class="cmd">/mute</span><span class="cmd">/ai</span>
+              <span class="cmd">/leaderboard</span><span class="cmd">/config</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMMANDS -->
+        <div class="panel" id="panel-commands">
+          <div class="cc">
+            <h3>⌨️ Prefix & Permissions</h3>
+            <div class="fr">
+              <div class="fg"><div class="fl">Command Prefix</div><input type="text" id="cfg_prefix" placeholder="/" maxlength="5" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Language</div>
+                <select id="cfg_lang" onchange="markDirty()"><option value="en">English</option><option value="de">German</option><option value="fr">French</option><option value="es">Spanish</option></select>
+              </div>
+            </div>
+            <div class="tog"><div><h4>Allow commands in DMs</h4><p>Users can use select commands via direct message</p></div><label class="sw"><input type="checkbox" id="cfg_allow_dms" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Delete command invocations</h4><p>Auto-delete messages that trigger bot commands</p></div><label class="sw"><input type="checkbox" id="cfg_delete_cmds" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Send command errors to user</h4><p>Show error messages to whoever ran the command</p></div><label class="sw"><input type="checkbox" id="cfg_cmd_errors" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+          <div class="cc">
+            <h3>🚫 Disabled Commands</h3>
+            <p style="font-size:.79rem;color:var(--t2);margin-bottom:.85rem">These commands will be completely disabled on your server.</p>
+            <div style="display:flex;gap:.45rem;margin-bottom:.7rem"><input type="text" id="dis-cmd-in" placeholder="Command name (e.g. tier)" style="flex:1"><button class="btn btn-red btn-sm" onclick="addDisCmd()">Add</button></div>
+            <div class="chip-list" id="dis-cmds"></div>
+          </div>
+        </div>
+
+        <!-- TIER TESTING -->
+        <div class="panel" id="panel-tiertesting">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">⚔️ Tier Testing</div><div class="cc-desc">Tier test sessions, ranks, and queue management</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_tier_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Results Channel</div><div class="ch"><input type="text" id="cfg_tier_ch" placeholder="tier-results" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Queue Channel</div><div class="ch"><input type="text" id="cfg_tier_qch" placeholder="tier-queue" oninput="markDirty()"></div></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Host Role</div><input type="text" id="cfg_tier_host" placeholder="Tier Host" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Max Queue Size</div><input type="number" id="cfg_tier_maxq" placeholder="20" min="1" max="200" oninput="markDirty()"></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Test Cooldown (hours)</div><input type="number" id="cfg_tier_cd" placeholder="24" min="0" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Test Timeout (minutes)</div><input type="number" id="cfg_tier_to" placeholder="30" min="5" oninput="markDirty()"></div>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>🏆 Tier Roles</h3>
+            <p style="font-size:.79rem;color:var(--t2);margin-bottom:.85rem">Map tier names to Discord roles assigned on test completion.</p>
+            <div id="tier-roles">
+              <div class="role-row"><div class="role-dot" style="background:#ff4444"></div><div class="role-name">HT1</div><input type="text" placeholder="Role name" style="flex:1;max-width:180px" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button></div>
+              <div class="role-row"><div class="role-dot" style="background:#ff8c00"></div><div class="role-name">HT2</div><input type="text" placeholder="Role name" style="flex:1;max-width:180px" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button></div>
+              <div class="role-row"><div class="role-dot" style="background:#ffd700"></div><div class="role-name">LT1</div><input type="text" placeholder="Role name" style="flex:1;max-width:180px" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button></div>
+              <div class="role-row"><div class="role-dot" style="background:#00bfff"></div><div class="role-name">LT2</div><input type="text" placeholder="Role name" style="flex:1;max-width:180px" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button></div>
+              <div class="role-row"><div class="role-dot" style="background:#1ecc6e"></div><div class="role-name">LT3</div><input type="text" placeholder="Role name" style="flex:1;max-width:180px" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="addTierRole()" style="margin-top:.6rem">+ Add Tier</button>
+          </div>
+          <div class="cc">
+            <h3>⚙️ Test Options</h3>
+            <div class="tog"><div><h4>Auto-close queue when full</h4><p>Automatically close queue when max size is reached</p></div><label class="sw"><input type="checkbox" id="cfg_tier_autoclose" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>DM player when it's their turn</h4><p>Notify via DM when the player is up next</p></div><label class="sw"><input type="checkbox" id="cfg_tier_notify" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Require IGN verification to queue</h4><p>Players must verify their IGN before joining queue</p></div><label class="sw"><input type="checkbox" id="cfg_tier_req_ign" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Post results embed automatically</h4><p>Bot posts a formatted embed when a test completes</p></div><label class="sw"><input type="checkbox" id="cfg_tier_embed" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- IGN VERIFY -->
+        <div class="panel" id="panel-ignverify">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">✅ IGN Verification</div><div class="cc-desc">Let players link their in-game name to their Discord account</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_ign_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Verify Channel</div><div class="ch"><input type="text" id="cfg_ign_ch" placeholder="verify-ign" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Verified Role</div><input type="text" id="cfg_ign_role" placeholder="Verified" oninput="markDirty()"></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Nickname Format</div><input type="text" id="cfg_ign_nick" placeholder="{ign} | {tier}" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Platform</div><select id="cfg_ign_platform" onchange="markDirty()"><option value="java">Java Edition</option><option value="bedrock">Bedrock Edition</option><option value="both">Both</option></select></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:.32rem;margin-top:.1rem">
+              <span class="var-tag" onclick="ivar('{ign}','cfg_ign_nick')">{ign}</span>
+              <span class="var-tag" onclick="ivar('{tier}','cfg_ign_nick')">{tier}</span>
+              <span class="var-tag" onclick="ivar('{user}','cfg_ign_nick')">{user}</span>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>⚙️ Options</h3>
+            <div class="tog"><div><h4>Allow re-verification</h4><p>Users can update their IGN after initial verification</p></div><label class="sw"><input type="checkbox" id="cfg_ign_reverify" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Require unique IGN</h4><p>Prevents two users from registering the same IGN</p></div><label class="sw"><input type="checkbox" id="cfg_ign_unique" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Auto-update nickname on verify</h4><p>Bot sets user's nickname to the format above</p></div><label class="sw"><input type="checkbox" id="cfg_ign_autonick" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Remove role if user leaves and rejoins</h4><p>Strip verified role if they rejoin without re-verifying</p></div><label class="sw"><input type="checkbox" id="cfg_ign_remove_leave" onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- ANTI-NUKE -->
+        <div class="panel" id="panel-antinuke">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">🛡️ Anti-Nuke</div><div class="cc-desc">Protect against mass bans, channel wipes, and role deletions</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_nuke_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Alert Channel</div><div class="ch"><input type="text" id="cfg_nuke_ch" placeholder="security-alerts" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Action on Trigger</div><select id="cfg_nuke_action" onchange="markDirty()"><option value="kick">Kick</option><option value="ban">Ban</option><option value="derank">Remove roles</option><option value="quarantine">Quarantine</option></select></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Danger Score Threshold (1–10)</div><input type="number" id="cfg_nuke_thresh" placeholder="7" min="1" max="10" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Whitelist Roles</div><input type="text" id="cfg_nuke_wl" placeholder="Admin, Moderator" oninput="markDirty()"></div>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>🔒 Detection Rules</h3>
+            <div class="tog"><div><h4>Mass ban detection</h4><p>Trigger when 3+ bans happen within 10 seconds</p></div><label class="sw"><input type="checkbox" id="cfg_nuke_ban" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Channel deletion detection</h4><p>Alert when channels are rapidly deleted</p></div><label class="sw"><input type="checkbox" id="cfg_nuke_chan" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Role deletion detection</h4><p>Alert when roles are mass-deleted</p></div><label class="sw"><input type="checkbox" id="cfg_nuke_role" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Admin permission grant detection</h4><p>Alert when admin is granted to a non-whitelisted role</p></div><label class="sw"><input type="checkbox" id="cfg_nuke_admin" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Webhook creation detection</h4><p>Alert when webhooks are created by unauthorized users</p></div><label class="sw"><input type="checkbox" id="cfg_nuke_webhook" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- AUTO-MOD -->
+        <div class="panel" id="panel-automod">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">🔨 Auto-Moderation</div><div class="cc-desc">Automatic content filtering and rule enforcement</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_amod_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Log Channel</div><div class="ch"><input type="text" id="cfg_amod_log" placeholder="mod-log" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Mute Role</div><input type="text" id="cfg_amod_mute" placeholder="Muted" oninput="markDirty()"></div>
+            </div>
+            <div class="fg"><div class="fl">Exempt Roles (comma separated)</div><input type="text" id="cfg_amod_exempt" placeholder="Admin, Mod, VIP" oninput="markDirty()"></div>
+          </div>
+          <div class="cc">
+            <h3>🧩 Filter Modules</h3>
+            <div class="amod-grid">
+              <div class="amod-card"><div class="amod-top"><span>🔗</span><span class="amod-name">LINK FILTER</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_links" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">Block external links</div><select class="amod-in" id="amod_links_act" onchange="markDirty()"><option>Delete</option><option>Delete + Warn</option><option>Delete + Mute</option></select></div>
+              <div class="amod-card"><div class="amod-top"><span>📨</span><span class="amod-name">SPAM FILTER</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_spam" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">Detect repeated messages</div><select class="amod-in" id="amod_spam_act" onchange="markDirty()"><option>Mute 5m</option><option>Mute 1h</option><option>Ban</option></select></div>
+              <div class="amod-card"><div class="amod-top"><span>💬</span><span class="amod-name">MASS MENTIONS</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_mentions" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">Max mentions per message</div><input class="amod-in" type="number" id="amod_mention_lim" placeholder="5" min="1" oninput="markDirty()"></div>
+              <div class="amod-card"><div class="amod-top"><span>🔠</span><span class="amod-name">CAPS FILTER</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_caps" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">% of caps to trigger</div><input class="amod-in" type="number" id="amod_caps_pct" placeholder="70" min="50" max="100" oninput="markDirty()"></div>
+              <div class="amod-card"><div class="amod-top"><span>🔇</span><span class="amod-name">WORD FILTER</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_words" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">Blocked words/phrases</div><textarea class="amod-in" id="amod_word_list" placeholder="word1, word2…" rows="2" oninput="markDirty()"></textarea></div>
+              <div class="amod-card"><div class="amod-top"><span>📩</span><span class="amod-name">INVITE FILTER</span><label class="sw" style="margin-left:auto"><input type="checkbox" id="amod_invites" onchange="markDirty()"><span class="sw-t"></span></label></div><div class="amod-sub">Block Discord invite links</div><select class="amod-in" id="amod_invite_act" onchange="markDirty()"><option>Delete</option><option>Delete + Warn</option><option>Kick</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANTI-RAID -->
+        <div class="panel" id="panel-antiraid">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">🚨 Anti-Raid</div><div class="cc-desc">Protect against coordinated join raids and bot attacks</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_raid_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Join Threshold (per 10s)</div><input type="number" id="cfg_raid_thresh" placeholder="10" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Action</div><select id="cfg_raid_action" onchange="markDirty()"><option value="verification">Enable verification</option><option value="lockdown">Server lockdown</option><option value="kick">Kick new joins</option></select></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Alert Channel</div><div class="ch"><input type="text" id="cfg_raid_ch" placeholder="security-alerts" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Lockdown Duration (min)</div><input type="number" id="cfg_raid_dur" placeholder="30" oninput="markDirty()"></div>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>🔒 Detection Options</h3>
+            <div class="tog"><div><h4>New account filter</h4><p>Flag accounts created less than 7 days ago</p></div><label class="sw"><input type="checkbox" id="cfg_raid_new" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>No avatar filter</h4><p>Flag accounts with no avatar on join</p></div><label class="sw"><input type="checkbox" id="cfg_raid_noav" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Auto-lift raid mode after timeout</h4><p>Automatically lift lockdown after the duration elapses</p></div><label class="sw"><input type="checkbox" id="cfg_raid_autolift" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Require phone verification during raid</h4><p>Enable Discord's phone gate during raid mode</p></div><label class="sw"><input type="checkbox" id="cfg_raid_phone" onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- WELCOME -->
+        <div class="panel" id="panel-welcome">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">👋 Welcome &amp; Leave</div><div class="cc-desc">Custom messages when members join or leave</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_wl_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+          </div>
+          <div class="cc">
+            <div class="cc-hdr"><div class="cc-title">✅ Welcome Message</div><label class="sw"><input type="checkbox" id="cfg_wl_join" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="fg"><div class="fl">Channel</div><div class="ch"><input type="text" id="cfg_wl_jch" placeholder="welcome" oninput="markDirty()"></div></div>
+            <div class="fg"><div class="fl">Message</div><textarea id="cfg_wl_jmsg" placeholder="Welcome {user} to {server}! You are member #{count}." oninput="markDirty()"></textarea></div>
+            <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0">
+              <span class="var-tag" onclick="ivar('{user}','cfg_wl_jmsg')">{user}</span>
+              <span class="var-tag" onclick="ivar('{server}','cfg_wl_jmsg')">{server}</span>
+              <span class="var-tag" onclick="ivar('{count}','cfg_wl_jmsg')">{count}</span>
+              <span class="var-tag" onclick="ivar('{mention}','cfg_wl_jmsg')">{mention}</span>
+            </div>
+            <div class="tog"><div><h4>Send as embed</h4><p>Format message as a rich Discord embed</p></div><label class="sw"><input type="checkbox" id="cfg_wl_jembed" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Auto-assign join role</h4><p>Give new members a role automatically</p></div><label class="sw"><input type="checkbox" id="cfg_wl_jrole_en" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="fg" style="margin-top:.75rem"><div class="fl">Auto Role</div><input type="text" id="cfg_wl_jrole" placeholder="Member" oninput="markDirty()"></div>
+          </div>
+          <div class="cc">
+            <div class="cc-hdr"><div class="cc-title">👋 Leave Message</div><label class="sw"><input type="checkbox" id="cfg_wl_leave" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="fg"><div class="fl">Channel</div><div class="ch"><input type="text" id="cfg_wl_lch" placeholder="general" oninput="markDirty()"></div></div>
+            <div class="fg"><div class="fl">Message</div><textarea id="cfg_wl_lmsg" placeholder="{user} has left the server. Goodbye!" oninput="markDirty()"></textarea></div>
+          </div>
+        </div>
+
+        <!-- TICKETS -->
+        <div class="panel" id="panel-tickets">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">🎫 Ticket System</div><div class="cc-desc">Support ticket creation and management</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_tick_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Ticket Category</div><input type="text" id="cfg_tick_cat" placeholder="Support" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Support Role</div><input type="text" id="cfg_tick_role" placeholder="Support Team" oninput="markDirty()"></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Log Channel</div><div class="ch"><input type="text" id="cfg_tick_log" placeholder="ticket-logs" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Max Tickets per User</div><input type="number" id="cfg_tick_max" placeholder="1" min="1" max="10" oninput="markDirty()"></div>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>📝 Ticket Panel</h3>
+            <div class="fg"><div class="fl">Panel Channel</div><div class="ch"><input type="text" id="cfg_tick_pch" placeholder="open-ticket" oninput="markDirty()"></div></div>
+            <div class="fg"><div class="fl">Panel Title</div><input type="text" id="cfg_tick_ptitle" placeholder="📩 Support Tickets" oninput="markDirty()"></div>
+            <div class="fg"><div class="fl">Panel Description</div><textarea id="cfg_tick_pdesc" placeholder="Click the button below to open a support ticket." oninput="markDirty()"></textarea></div>
+            <div class="fg"><div class="fl">Button Label</div><input type="text" id="cfg_tick_pbtn" placeholder="Open Ticket" oninput="markDirty()"></div>
+          </div>
+          <div class="cc">
+            <h3>⚙️ Options</h3>
+            <div class="tog"><div><h4>Save transcript on close</h4><p>Save a full transcript when a ticket is closed</p></div><label class="sw"><input type="checkbox" id="cfg_tick_transcript" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>DM transcript to user</h4><p>Send the transcript to the ticket creator on close</p></div><label class="sw"><input type="checkbox" id="cfg_tick_dm" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Ping support role on open</h4><p>Mention the support role when a new ticket is created</p></div><label class="sw"><input type="checkbox" id="cfg_tick_ping" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Require close reason</h4><p>Staff must provide a reason when closing a ticket</p></div><label class="sw"><input type="checkbox" id="cfg_tick_reason" onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div class="panel" id="panel-applications">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">📋 Applications</div><div class="cc-desc">Staff and role application forms with review workflow</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_app_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Review Channel</div><div class="ch"><input type="text" id="cfg_app_rch" placeholder="applications" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Reviewer Role</div><input type="text" id="cfg_app_reviewer" placeholder="Management" oninput="markDirty()"></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Role Given on Accept</div><input type="text" id="cfg_app_accept_role" placeholder="Staff" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Cooldown (hours)</div><input type="number" id="cfg_app_cd" placeholder="72" oninput="markDirty()"></div>
+            </div>
+          </div>
+          <div class="cc">
+            <h3>❓ Application Questions</h3>
+            <p style="font-size:.79rem;color:var(--t2);margin-bottom:.8rem">Questions sent to applicants via DM in order.</p>
+            <div id="app-qs">
+              <div class="fg"><div class="fl">Question 1</div><input type="text" value="What is your age?" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Question 2</div><input type="text" value="Why do you want to join the staff team?" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Question 3</div><input type="text" value="How many hours per week can you dedicate?" oninput="markDirty()"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="addAppQ()" style="margin-top:.5rem">+ Add Question</button>
+          </div>
+          <div class="cc">
+            <h3>⚙️ Options</h3>
+            <div class="tog"><div><h4>DM applicant with result</h4><p>Notify the applicant of accept/deny via DM</p></div><label class="sw"><input type="checkbox" id="cfg_app_dm" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Ping reviewers on new application</h4><p>Mention the reviewer role when an application arrives</p></div><label class="sw"><input type="checkbox" id="cfg_app_ping" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- AI SUPPORT -->
+        <div class="panel" id="panel-ai">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">🤖 AI Support</div><div class="cc-desc">Automated AI responses for common questions</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_ai_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">AI Channel</div><div class="ch"><input type="text" id="cfg_ai_ch" placeholder="ai-support" oninput="markDirty()"></div></div>
+              <div class="fg"><div class="fl">Response Style</div><select id="cfg_ai_style" onchange="markDirty()"><option value="concise">Concise</option><option value="detailed">Detailed</option><option value="friendly">Friendly</option></select></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><div class="fl">Max Response Tokens</div><input type="number" id="cfg_ai_tokens" placeholder="500" oninput="markDirty()"></div>
+              <div class="fg"><div class="fl">Per-User Cooldown (sec)</div><input type="number" id="cfg_ai_cd" placeholder="5" oninput="markDirty()"></div>
+            </div>
+            <div class="fg"><div class="fl">System Prompt / Context</div><textarea id="cfg_ai_prompt" placeholder="You are a helpful assistant for a Minecraft PvP tier testing server…" rows="4" oninput="markDirty()"></textarea></div>
+          </div>
+          <div class="cc">
+            <h3>⚙️ Behavior</h3>
+            <div class="tog"><div><h4>Respond to all messages in channel</h4><p>AI responds to every message in the AI channel</p></div><label class="sw"><input type="checkbox" id="cfg_ai_all" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Mention user in response</h4><p>Ping the user who asked the question</p></div><label class="sw"><input type="checkbox" id="cfg_ai_mention" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Include AI disclaimer</h4><p>Add "I am an AI" disclaimer to responses</p></div><label class="sw"><input type="checkbox" id="cfg_ai_disclaimer" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- LOGGING -->
+        <div class="panel" id="panel-logging">
+          <div class="cc">
+            <div class="cc-hdr">
+              <div><div class="cc-title">📜 Logging</div><div class="cc-desc">Detailed audit logs for server activity</div></div>
+              <label class="sw"><input type="checkbox" id="cfg_log_en" onchange="markDirty();dots()"><span class="sw-t"></span></label>
+            </div>
+            <div class="fg"><div class="fl">Default Log Channel</div><div class="ch"><input type="text" id="cfg_log_ch" placeholder="server-logs" oninput="markDirty()"></div></div>
+          </div>
+          <div class="cc">
+            <h3>📋 Log Events</h3>
+            <div class="tog"><div><h4>Message deletions</h4><p>Log when messages are deleted</p></div><label class="sw"><input type="checkbox" id="log_del" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Message edits</h4><p>Log edits with before/after comparison</p></div><label class="sw"><input type="checkbox" id="log_edit" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Member joins &amp; leaves</h4><p>Log when members join or leave</p></div><label class="sw"><input type="checkbox" id="log_members" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Role changes</h4><p>Log when member roles are added or removed</p></div><label class="sw"><input type="checkbox" id="log_roles" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Moderation actions</h4><p>Log all kicks, bans, mutes, and warns</p></div><label class="sw"><input type="checkbox" id="log_mod" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Channel changes</h4><p>Log channel creation, deletion, and edits</p></div><label class="sw"><input type="checkbox" id="log_channels" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Voice activity</h4><p>Log voice joins, leaves, and moves</p></div><label class="sw"><input type="checkbox" id="log_voice" onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Tier test events</h4><p>Log all tier test completions and assignments</p></div><label class="sw"><input type="checkbox" id="log_tier" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="panel" id="panel-settings">
+          <div class="cc">
+            <h3>🔧 Bot Behavior</h3>
+            <div class="tog"><div><h4>Send DM on warn/mute</h4><p>Notify members via DM when they're moderated</p></div><label class="sw"><input type="checkbox" id="cfg_dm_mod" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="tog"><div><h4>Use embeds for responses</h4><p>Format bot responses as rich embeds</p></div><label class="sw"><input type="checkbox" id="cfg_embeds" checked onchange="markDirty()"><span class="sw-t"></span></label></div>
+            <div class="fg" style="margin-top:.75rem"><div class="fl">Timezone</div><select id="cfg_tz" onchange="markDirty()"><option>UTC</option><option>US/Eastern</option><option>US/Pacific</option><option>Europe/Berlin</option><option>Europe/London</option></select></div>
+          </div>
+          <div class="cc" style="border-color:rgba(220,17,17,.18)">
+            <h3 style="color:#ff4444">⚠️ Danger Zone</h3>
+            <div class="danger-row"><div><h4>Reset all settings</h4><p>Restore all config to default — cannot be undone</p></div><button class="btn-danger" onclick="resetCfg()">Reset</button></div>
+          </div>
+        </div>
+
+      </div><!-- /scroll -->
+    </div><!-- /pg-server -->
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_ID='1137444352843583570';
+let user=null,guilds=[],guild=null,cfg={},dirty=false;
+
+/* theme */
+let dark=localStorage.getItem('vx_theme')!=='light';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('theme-btn').textContent=dark?'🌙':'☀️';}
+function toggleTheme(){dark=!dark;localStorage.setItem('vx_theme',dark?'dark':'light');applyTheme();}
+applyTheme();
+
+/* auth */
+function doLogout(){['vx_user','vx_token','vx_guilds'].forEach(k=>localStorage.removeItem(k));location.href='index.html';}
+
+function init(){
+  if(location.hostname==='localhost'&&!localStorage.getItem('vx_user')){
+    localStorage.setItem('vx_user',JSON.stringify({id:ADMIN_ID,username:'DevUser',avatar:null,discriminator:'0'}));
+    localStorage.setItem('vx_guilds',JSON.stringify([
+      {id:'111111111111111111',name:'VELTRIX Community',icon:null,permissions:'8'},
+      {id:'222222222222222222',name:'My Community',icon:null,permissions:'8'},
+      {id:'333333333333333333',name:'Storm Tiers',icon:null,permissions:'8'},
+      {id:'444444444444444444',name:'Read-Only Server',icon:null,permissions:'0'},
+    ]));
+  }
+  const s=localStorage.getItem('vx_user');
+  if(!s){location.href='index.html';return;}
+  user=JSON.parse(s);
+  const av=user.avatar?`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`:'https://cdn.discordapp.com/embed/avatars/0.png';
+  document.getElementById('user-av').src=av;
+  document.getElementById('user-name').textContent=user.username;
+  if(user.id===ADMIN_ID)document.getElementById('admin-link').style.display='flex';
+  const sg=localStorage.getItem('vx_guilds');
+  if(sg)guilds=JSON.parse(sg)||[];
+  goSelect();
+}
+
+/* pages */
+function goSelect(){
+  document.getElementById('pg-select').style.display='block';
+  document.getElementById('pg-server').classList.remove('show');
+  document.getElementById('sidebar').classList.add('off');
+  renderGrids(guilds);
+}
+function goServer(){
+  document.getElementById('pg-select').style.display='none';
+  document.getElementById('pg-server').classList.add('show');
+  document.getElementById('sidebar').classList.remove('off');
+}
+
+/* server grid */
+let allG=[];
+function renderGrids(list){
+  allG=list;
+  const admin=list.filter(g=>perm(g));
+  const view=list.filter(g=>!perm(g));
+  document.getElementById('sec-admin').style.display=admin.length?'block':'none';
+  document.getElementById('sec-view').style.display=view.length?'block':'none';
+  document.getElementById('grid-admin').innerHTML=admin.map(g=>sCard(g,true)).join('');
+  document.getElementById('grid-view').innerHTML=view.map(g=>sCard(g,false)).join('');
+}
+function filterSrv(q){const f=guilds.filter(g=>(g.name||'').toLowerCase().includes(q.toLowerCase()));renderGrids(f);}
+function sCard(g,click){
+  const ico=g.icon?`<img src="https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64" alt="">`:g.name.charAt(0);
+  const badge=click?'<span class="badge b-admin">⚙️ Admin</span>':'<span class="badge b-view">👁 View</span>';
+  const oc=click?`onclick="openSrv('${g.id}','${(g.name||'').replace(/'/g,"\\'")}','${g.icon||''}')"`:'' ;
+  return`<div class="srv-card${click?'':' no-click'}" ${oc}><div class="sc-ico">${ico}</div><div style="min-width:0"><div class="sc-name">${g.name||'Unknown'}</div><div class="sc-id">${g.id}</div>${badge}</div></div>`;
+}
+function perm(g){try{return(BigInt(g.permissions||0)&8n)===8n;}catch(e){return false;}}
+
+/* open server */
+function openSrv(id,name,icon){
+  guild={id,name,icon};
+  cfg=JSON.parse(localStorage.getItem('vx_cfg_'+id)||'{}');
+  const si=document.getElementById('sb-ico');
+  si.innerHTML=icon?`<img src="https://cdn.discordapp.com/icons/${id}/${icon}.png?size=64" alt="">`:name.charAt(0);
+  document.getElementById('sb-name').textContent=name;
+  document.getElementById('guild-id-display').textContent=id;
+  loadCfg();dots();
+  nav(document.querySelector('.sb-item[data-p="overview"]'));
+  goServer();
+}
+
+/* nav */
+function nav(el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  const p=document.getElementById('panel-'+el.getAttribute('data-p'));
+  if(p)p.classList.add('on');
+  document.getElementById('panel-title').textContent=el.textContent.replace(/[●○]/g,'').trim();
+}
+
+/* dots */
+const MODS={antinuke:'cfg_nuke_en',automod:'cfg_amod_en',antiraid:'cfg_raid_en',tiertesting:'cfg_tier_en',ignverify:'cfg_ign_en',welcome:'cfg_wl_en',tickets:'cfg_tick_en',applications:'cfg_app_en',ai:'cfg_ai_en',logging:'cfg_log_en'};
+function dots(){
+  Object.entries(MODS).forEach(([m,id])=>{const el=document.getElementById('dot-'+m);if(!el)return;const on=document.getElementById(id)?.checked;el.className='mod-dot '+(on?'active':'inactive');});
+  const active=Object.entries(MODS).filter(([,id])=>document.getElementById(id)?.checked).map(([m])=>({antinuke:'Anti-Nuke',automod:'Auto-Mod',antiraid:'Anti-Raid',tiertesting:'Tier Testing',ignverify:'IGN Verify',welcome:'Welcome',tickets:'Tickets',applications:'Applications',ai:'AI Support',logging:'Logging'}[m]));
+  const el=document.getElementById('ov-mods');if(!el)return;
+  el.innerHTML=active.length?active.map(n=>`<span class="badge b-green">✓ ${n}</span>`).join(''):'<span style="color:var(--t3);font-size:.82rem">No modules enabled</span>';
+}
+
+/* dirty */
+function markDirty(){dirty=true;document.getElementById('save-bar').classList.add('show');}
+function discardChanges(){dirty=false;document.getElementById('save-bar').classList.remove('show');loadCfg();showToast('Changes discarded','info');}
+
+/* save/load */
+function saveConfig(){
+  if(!guild)return;
+  const d=collectCfg();
+  localStorage.setItem('vx_cfg_'+guild.id,JSON.stringify(d));
+  cfg=d;dirty=false;
+  document.getElementById('save-bar').classList.remove('show');
+  showToast('Config saved!','ok');
+}
+function resetCfg(){if(!guild||!confirm('Reset all settings for this server?'))return;localStorage.removeItem('vx_cfg_'+guild.id);cfg={};loadCfg();showToast('Config reset','info');}
+
+const gv=(id,d='')=>{const e=document.getElementById(id);return e?e.value:d;};
+const gc=(id,d=false)=>{const e=document.getElementById(id);return e?e.checked:d;};
+const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+const sc=(id,v)=>{const e=document.getElementById(id);if(e)e.checked=!!v;};
+
+function collectCfg(){
+  return{
+    prefix:gv('cfg_prefix'),allow_dms:gc('cfg_allow_dms'),delete_cmds:gc('cfg_delete_cmds'),cmd_errors:gc('cfg_cmd_errors',true),lang:gv('cfg_lang','en'),dm_mod:gc('cfg_dm_mod',true),embeds:gc('cfg_embeds',true),tz:gv('cfg_tz','UTC'),
+    tiertesting:{enabled:gc('cfg_tier_en'),ch:gv('cfg_tier_ch'),qch:gv('cfg_tier_qch'),host:gv('cfg_tier_host'),maxq:gv('cfg_tier_maxq'),cd:gv('cfg_tier_cd'),to:gv('cfg_tier_to'),autoclose:gc('cfg_tier_autoclose'),notify:gc('cfg_tier_notify',true),req_ign:gc('cfg_tier_req_ign'),embed:gc('cfg_tier_embed',true)},
+    ignverify:{enabled:gc('cfg_ign_en'),ch:gv('cfg_ign_ch'),role:gv('cfg_ign_role'),nick:gv('cfg_ign_nick'),platform:gv('cfg_ign_platform'),reverify:gc('cfg_ign_reverify',true),unique:gc('cfg_ign_unique',true),autonick:gc('cfg_ign_autonick'),remove_leave:gc('cfg_ign_remove_leave')},
+    antinuke:{enabled:gc('cfg_nuke_en'),ch:gv('cfg_nuke_ch'),action:gv('cfg_nuke_action'),thresh:gv('cfg_nuke_thresh'),wl:gv('cfg_nuke_wl'),ban:gc('cfg_nuke_ban',true),chan:gc('cfg_nuke_chan',true),role:gc('cfg_nuke_role',true),admin:gc('cfg_nuke_admin',true),webhook:gc('cfg_nuke_webhook',true)},
+    automod:{enabled:gc('cfg_amod_en'),log:gv('cfg_amod_log'),mute:gv('cfg_amod_mute'),exempt:gv('cfg_amod_exempt'),links:gc('amod_links'),links_act:gv('amod_links_act'),spam:gc('amod_spam'),spam_act:gv('amod_spam_act'),mentions:gc('amod_mentions'),mlim:gv('amod_mention_lim'),caps:gc('amod_caps'),caps_pct:gv('amod_caps_pct'),words:gc('amod_words'),word_list:gv('amod_word_list'),invites:gc('amod_invites'),invite_act:gv('amod_invite_act')},
+    antiraid:{enabled:gc('cfg_raid_en'),thresh:gv('cfg_raid_thresh'),action:gv('cfg_raid_action'),ch:gv('cfg_raid_ch'),dur:gv('cfg_raid_dur'),new_acc:gc('cfg_raid_new'),no_av:gc('cfg_raid_noav'),autolift:gc('cfg_raid_autolift',true),phone:gc('cfg_raid_phone')},
+    welcome:{enabled:gc('cfg_wl_en'),join:gc('cfg_wl_join'),jch:gv('cfg_wl_jch'),jmsg:gv('cfg_wl_jmsg'),jembed:gc('cfg_wl_jembed'),jrole_en:gc('cfg_wl_jrole_en'),jrole:gv('cfg_wl_jrole'),leave:gc('cfg_wl_leave'),lch:gv('cfg_wl_lch'),lmsg:gv('cfg_wl_lmsg')},
+    tickets:{enabled:gc('cfg_tick_en'),cat:gv('cfg_tick_cat'),role:gv('cfg_tick_role'),log:gv('cfg_tick_log'),max:gv('cfg_tick_max'),pch:gv('cfg_tick_pch'),ptitle:gv('cfg_tick_ptitle'),pdesc:gv('cfg_tick_pdesc'),pbtn:gv('cfg_tick_pbtn'),transcript:gc('cfg_tick_transcript',true),dm:gc('cfg_tick_dm'),ping:gc('cfg_tick_ping',true),reason:gc('cfg_tick_reason')},
+    applications:{enabled:gc('cfg_app_en'),rch:gv('cfg_app_rch'),reviewer:gv('cfg_app_reviewer'),accept_role:gv('cfg_app_accept_role'),cd:gv('cfg_app_cd'),dm:gc('cfg_app_dm',true),ping:gc('cfg_app_ping',true)},
+    ai:{enabled:gc('cfg_ai_en'),ch:gv('cfg_ai_ch'),style:gv('cfg_ai_style'),tokens:gv('cfg_ai_tokens'),cd:gv('cfg_ai_cd'),prompt:gv('cfg_ai_prompt'),all:gc('cfg_ai_all',true),mention:gc('cfg_ai_mention'),disclaimer:gc('cfg_ai_disclaimer',true)},
+    logging:{enabled:gc('cfg_log_en'),ch:gv('cfg_log_ch'),del:gc('log_del',true),edit:gc('log_edit',true),members:gc('log_members',true),roles:gc('log_roles',true),mod:gc('log_mod',true),channels:gc('log_channels'),voice:gc('log_voice'),tier:gc('log_tier',true)}
+  };
+}
+
+function loadCfg(){
+  const c=cfg;
+  sv('cfg_prefix',c.prefix);sc('cfg_allow_dms',c.allow_dms);sc('cfg_delete_cmds',c.delete_cmds);sc('cfg_cmd_errors',c.cmd_errors!==false);sv('cfg_lang',c.lang);sc('cfg_dm_mod',c.dm_mod!==false);sc('cfg_embeds',c.embeds!==false);sv('cfg_tz',c.tz);
+  const t=c.tiertesting||{};sc('cfg_tier_en',t.enabled);sv('cfg_tier_ch',t.ch);sv('cfg_tier_qch',t.qch);sv('cfg_tier_host',t.host);sv('cfg_tier_maxq',t.maxq);sv('cfg_tier_cd',t.cd);sv('cfg_tier_to',t.to);sc('cfg_tier_autoclose',t.autoclose);sc('cfg_tier_notify',t.notify!==false);sc('cfg_tier_req_ign',t.req_ign);sc('cfg_tier_embed',t.embed!==false);
+  const i=c.ignverify||{};sc('cfg_ign_en',i.enabled);sv('cfg_ign_ch',i.ch);sv('cfg_ign_role',i.role);sv('cfg_ign_nick',i.nick);sv('cfg_ign_platform',i.platform);sc('cfg_ign_reverify',i.reverify!==false);sc('cfg_ign_unique',i.unique!==false);sc('cfg_ign_autonick',i.autonick);sc('cfg_ign_remove_leave',i.remove_leave);
+  const n=c.antinuke||{};sc('cfg_nuke_en',n.enabled);sv('cfg_nuke_ch',n.ch);sv('cfg_nuke_action',n.action);sv('cfg_nuke_thresh',n.thresh);sv('cfg_nuke_wl',n.wl);sc('cfg_nuke_ban',n.ban!==false);sc('cfg_nuke_chan',n.chan!==false);sc('cfg_nuke_role',n.role!==false);sc('cfg_nuke_admin',n.admin!==false);sc('cfg_nuke_webhook',n.webhook!==false);
+  const am=c.automod||{};sc('cfg_amod_en',am.enabled);sv('cfg_amod_log',am.log);sv('cfg_amod_mute',am.mute);sv('cfg_amod_exempt',am.exempt);sc('amod_links',am.links);sv('amod_links_act',am.links_act);sc('amod_spam',am.spam);sv('amod_spam_act',am.spam_act);sc('amod_mentions',am.mentions);sv('amod_mention_lim',am.mlim);sc('amod_caps',am.caps);sv('amod_caps_pct',am.caps_pct);sc('amod_words',am.words);sv('amod_word_list',am.word_list);sc('amod_invites',am.invites);sv('amod_invite_act',am.invite_act);
+  const ar=c.antiraid||{};sc('cfg_raid_en',ar.enabled);sv('cfg_raid_thresh',ar.thresh);sv('cfg_raid_action',ar.action);sv('cfg_raid_ch',ar.ch);sv('cfg_raid_dur',ar.dur);sc('cfg_raid_new',ar.new_acc);sc('cfg_raid_noav',ar.no_av);sc('cfg_raid_autolift',ar.autolift!==false);sc('cfg_raid_phone',ar.phone);
+  const wl=c.welcome||{};sc('cfg_wl_en',wl.enabled);sc('cfg_wl_join',wl.join);sv('cfg_wl_jch',wl.jch);sv('cfg_wl_jmsg',wl.jmsg);sc('cfg_wl_jembed',wl.jembed);sc('cfg_wl_jrole_en',wl.jrole_en);sv('cfg_wl_jrole',wl.jrole);sc('cfg_wl_leave',wl.leave);sv('cfg_wl_lch',wl.lch);sv('cfg_wl_lmsg',wl.lmsg);
+  const ti=c.tickets||{};sc('cfg_tick_en',ti.enabled);sv('cfg_tick_cat',ti.cat);sv('cfg_tick_role',ti.role);sv('cfg_tick_log',ti.log);sv('cfg_tick_max',ti.max);sv('cfg_tick_pch',ti.pch);sv('cfg_tick_ptitle',ti.ptitle);sv('cfg_tick_pdesc',ti.pdesc);sv('cfg_tick_pbtn',ti.pbtn);sc('cfg_tick_transcript',ti.transcript!==false);sc('cfg_tick_dm',ti.dm);sc('cfg_tick_ping',ti.ping!==false);sc('cfg_tick_reason',ti.reason);
+  const ap=c.applications||{};sc('cfg_app_en',ap.enabled);sv('cfg_app_rch',ap.rch);sv('cfg_app_reviewer',ap.reviewer);sv('cfg_app_accept_role',ap.accept_role);sv('cfg_app_cd',ap.cd);sc('cfg_app_dm',ap.dm!==false);sc('cfg_app_ping',ap.ping!==false);
+  const ai=c.ai||{};sc('cfg_ai_en',ai.enabled);sv('cfg_ai_ch',ai.ch);sv('cfg_ai_style',ai.style);sv('cfg_ai_tokens',ai.tokens);sv('cfg_ai_cd',ai.cd);sv('cfg_ai_prompt',ai.prompt);sc('cfg_ai_all',ai.all!==false);sc('cfg_ai_mention',ai.mention);sc('cfg_ai_disclaimer',ai.disclaimer!==false);
+  const lo=c.logging||{};sc('cfg_log_en',lo.enabled);sv('cfg_log_ch',lo.ch);sc('log_del',lo.del!==false);sc('log_edit',lo.edit!==false);sc('log_members',lo.members!==false);sc('log_roles',lo.roles!==false);sc('log_mod',lo.mod!==false);sc('log_channels',lo.channels);sc('log_voice',lo.voice);sc('log_tier',lo.tier!==false);
+  dots();
+}
+
+/* helpers */
+function ivar(v,id){const e=document.getElementById(id);if(!e)return;const s=e.selectionStart,en=e.selectionEnd;e.value=e.value.slice(0,s)+v+e.value.slice(en);e.focus();markDirty();}
+function addTierRole(){const l=document.getElementById('tier-roles');const d=document.createElement('div');d.className='role-row';d.innerHTML=`<div class="role-dot" style="background:#9966ff"></div><input type="text" placeholder="Tier name" style="width:55px" oninput="markDirty()"><input type="text" placeholder="Role name" style="flex:1;max-width:180px;margin-left:.5rem" oninput="markDirty()"><button class="btn-danger" onclick="this.parentElement.remove();markDirty()" style="margin-left:.5rem">✕</button>`;l.appendChild(d);markDirty();}
+function addAppQ(){const c=document.getElementById('app-qs').children.length+1;const d=document.createElement('div');d.className='fg';d.innerHTML=`<div class="fl">Question ${c}</div><input type="text" placeholder="Your question…" oninput="markDirty()">`;document.getElementById('app-qs').appendChild(d);markDirty();}
+function addDisCmd(){const inp=document.getElementById('dis-cmd-in');const v=inp.value.trim();if(!v)return;const t=document.createElement('span');t.className='tag';t.innerHTML=`/${v}<button class="tag-x" onclick="this.parentElement.remove();markDirty()">✕</button>`;document.getElementById('dis-cmds').appendChild(t);inp.value='';markDirty();}
+
+/* toast */
+function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type}`;void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+init();
+</script>
+</body>
+</html>
