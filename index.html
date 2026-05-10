@@ -638,7 +638,7 @@ if(!dark){document.documentElement.setAttribute('data-theme','light');document.g
 
 /* ══ AUTH ══ */
 const CLIENT_ID='1487514513304584293';
-const REDIRECT_URI = window.location.origin + '/';
+const REDIRECT_URI = 'https://veltrix-website-qbm6.onrender.com/callback';
 const OAUTH = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds`;
 
 function doLogin(){location.href=OAUTH;}
