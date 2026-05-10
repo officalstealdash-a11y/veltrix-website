@@ -638,12 +638,15 @@ if(!dark){document.documentElement.setAttribute('data-theme','light');document.g
 
 /* ══ AUTH ══ */
 const CLIENT_ID='1487514513304584293';
-const REDIRECT_URI = 'https://veltrix-website-qbm6.onrender.com/callback';
-const OAUTH = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds`;
+const BACKEND = 'https://veltrix-website-qbm6.onrender.com';
 
-function doLogin(){location.href=OAUTH;}
-function doLogout(){localStorage.removeItem('vx_user');localStorage.removeItem('vx_token');localStorage.removeItem('vx_guilds');showLoggedOut();}
-function goDash(){if(localStorage.getItem('vx_user')){location.href='dashboard.html';}else{doLogin();}}
+function doLogin(){ location.href = BACKEND + '/login'; }
+function doLogout(){ location.href = BACKEND + '/logout'; }
+function goDash(){
+  fetch(BACKEND + '/api/me', {credentials:'include'})
+    .then(r => r.ok ? location.href = BACKEND + '/dashboard' : doLogin())
+    .catch(() => doLogin());
+}
 function showLoggedIn(u){
   const adminLink = document.getElementById('nav-admin-link');
   if(adminLink) adminLink.style.display = (u.id === '1137444352843583570') ? 'block' : 'none';
