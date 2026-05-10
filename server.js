@@ -6,14 +6,12 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const {
-  DISCORD_CLIENT_ID: CLIENT_ID = '816582705826365471',
-  DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET || '',
-  DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN || '',
-  REDIRECT_URI = 'https://veltrix-website-qbm6.onrender.com/callback',
-  SECRET_KEY = 'veltrix-secret-2026',
-  PORT = 3000,
-} = process.env;
+const CLIENT_ID = '816582705826365471';
+const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
+const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || '';
+const REDIRECT_URI = 'https://veltrix-website-qbm6.onrender.com/callback';
+const SECRET_KEY = 'veltrix-secret-2026';
+const PORT = 3000;
 
 const DISCORD_API = 'https://discord.com/api/v10';
 const CONFIG_DIR = join(__dirname, 'guild_configs');
