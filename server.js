@@ -74,6 +74,18 @@ function requireLogin(req, res, next) {
   next();
 }
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://tierscommunity.netlify.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
+app.get('/api/me', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  res.json({ user: req.session.user, guilds: req.session.guilds });
+});
+
 app.get('/login', (_, res) => res.redirect(OAUTH_URL));
 
 app.get('/logout', (req, res) => {
