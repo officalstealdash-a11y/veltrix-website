@@ -8,10 +8,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const {
   DISCORD_CLIENT_ID: CLIENT_ID = '816582705826365471',
-  DISCORD_CLIENT_SECRET: CLIENT_SECRET = 'YOUR_CLIENT_SECRET_HERE',
-  DISCORD_BOT_TOKEN: BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE',
-  REDIRECT_URI = 'http://localhost:3000/callback',
-  SECRET_KEY = 'change-this-in-production',
+  DISCORD_CLIENT_SECRET: CLIENT_SECRET = 'ffyOItHlMJrRcw6oH0iFeXnH4jYYOG3N',
+  DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN || '',
+  REDIRECT_URI = 'https://veltrix-website-qbm6.onrender.com/callback',
+  SECRET_KEY = 'veltrix-secret-2026',
   PORT = 3000,
 } = process.env;
 
