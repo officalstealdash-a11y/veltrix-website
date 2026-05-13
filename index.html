@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VELTRIX — Discord Bot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="landing-styles.css">
 <style>
+/* legacy block removed — see landing-styles.css */
 :root,[data-theme="dark"]{
   --bg:#08080e;--bg2:#0d0d17;--bg3:#161622;
   --panel:#111120;--panel2:#1a1a2e;
@@ -278,7 +279,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border2);padding:3rem 5%
     <a href="#why">Why Us?</a>
     <a href="#status" data-t="navStatus">Bot Status</a>
     <a href="dashboard.html" data-t="navDash">Dashboard</a>
-    <a href="admin.html" id="nav-admin-link" style="display:none;color:#f5c518" data-t="navAdmin">👑 Admin</a>
+    <a href="admin.html" id="nav-admin-link" style="display:none;color:var(--gold)" data-t="navAdmin">👑 Admin</a>
     <a href="https://discord.gg/uu9SY6Hq" target="_blank" data-t="navSupport">Support</a>
   </div>
   <div class="nav-right">
@@ -310,15 +311,16 @@ footer{background:var(--bg2);border-top:1px solid var(--border2);padding:3rem 5%
 <!-- HERO -->
 
 <!-- COMING SOON BANNER -->
-<div id="launch-banner" style="background:linear-gradient(90deg,rgba(212,32,96,.15),rgba(245,197,24,.1),rgba(212,32,96,.15));border-bottom:1px solid rgba(245,197,24,.2);padding:.55rem 5%;display:flex;align-items:center;justify-content:space-between;position:fixed;top:60px;left:0;right:0;z-index:499">
+<div id="launch-banner">
   <div style="display:flex;align-items:center;gap:.75rem;font-size:.82rem">
-    <span style="background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);color:#f5c518;padding:.15rem .6rem;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase">🚀 Coming Soon</span>
+    <span class="lb-pill">🚀 Coming Soon</span>
     <span style="color:var(--muted2)">VELTRIX will be the <strong style="color:var(--text)">first public Minecraft PvP tierlist bot</strong> — launching soon on top.gg</span>
   </div>
   <button onclick="document.getElementById('launch-banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:.1rem .3rem;line-height:1">✕</button>
 </div>
-<section class="hero" style="padding-top:110px;">
+<section class="hero" style="padding-top:128px;">
   <div class="hero-grid"></div>
+  <div class="hero-inner">
   <div class="hc">
     <div class="badge" data-t="heroBadge">🔥 Minecraft PvP Discord Bot</div>
     <h1><em data-t="heroEm">VELTRIX.</em></h1>
@@ -336,6 +338,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border2);padding:3rem 5%
       <div><span class="sn">8</span><span class="sl" data-t="s3">Gamemodes</span></div>
       <div><span class="sn" data-t="s4n">Free</span><span class="sl" data-t="s4">Forever</span></div>
     </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true"><span class="hero-deco">VX</span></div>
   </div>
 </section>
 
@@ -449,7 +453,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border2);padding:3rem 5%
         <div class="mdot" style="background:#ff5f57"></div>
         <div class="mdot" style="background:#ffbd2e"></div>
         <div class="mdot" style="background:#28ca41"></div>
-        <span class="mock-url">veltrix.netlify.app/dashboard.html</span>
+        <span class="mock-url">./dashboard.html</span>
       </div>
       <div class="mock-body">
         <div class="mock-side">
@@ -653,12 +657,11 @@ function showLoggedIn(u){
   const av=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`:'https://cdn.discordapp.com/embed/avatars/0.png';
   document.getElementById('uav').src=av;document.getElementById('uname').textContent=u.username;
   document.getElementById('uchip').classList.add('on');
-  if(u.id===CLIENT_ID.slice(0,4)||u.id==='1137444352843583570'){const al=document.getElementById('nav-admin-link');if(al)al.style.display='block';}
   document.getElementById('nav-login-btn').style.display='none';
   document.getElementById('nav-logout-btn').style.display='flex';
   const T=I18N[lang]||I18N.en;
   document.getElementById('lcard').innerHTML=`
-    <img src="${av}" style="width:72px;height:72px;border-radius:50%;border:2px solid rgba(212,32,96,.35)">
+    <img src="${av}" style="width:72px;height:72px;border-radius:4px;border:2px solid rgba(0,245,212,.45)">
     <h2>Hey, ${u.username}! 👋</h2>
     <p style="color:var(--green);font-weight:600;font-size:.9rem">✓ ${lang==='de'?'Angemeldet mit Discord':'Logged in with Discord'}</p>
     <p style="font-size:.85rem;color:var(--muted2);line-height:1.6">${lang==='de'?'Du bist eingeloggt. Öffne das Dashboard um deinen Server zu konfigurieren.':'You\'re logged in. Open the dashboard to configure your server.'}</p>
